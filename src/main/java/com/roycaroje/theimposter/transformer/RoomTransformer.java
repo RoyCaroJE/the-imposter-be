@@ -1,0 +1,32 @@
+package com.roycaroje.theimposter.transformer;
+
+import com.roycaroje.theimposter.graphql.RoomDTO;
+import com.roycaroje.theimposter.model.Room;
+import org.springframework.stereotype.Component;
+
+import java.time.Instant;
+import java.util.UUID;
+
+@Component
+public class RoomTransformer {
+
+    public Room createBaseForNewRoom(String roomName, int numImpostors){
+        Room room = new Room();
+        room.setPublicId(UUID.randomUUID());
+        room.setStatus("CREATED");
+        room.setNumImpostors(numImpostors);
+        room.setRoomName(roomName);
+        room.setCreated(Instant.now());
+        return room;
+    }
+
+    public void mapModelToDto(Room model, RoomDTO dto){
+        dto.setCode(model.getCode());
+        dto.setWord(model.getWord());
+        dto.setAdminPublicId(model.getAdminPublicId());
+        dto.setStatus(model.getStatus());
+        dto.setPublicId(model.getPublicId());
+        dto.setNumImpostors(model.getNumImpostors());
+        dto.setCreated(model.getCreated().toString());
+    }
+}

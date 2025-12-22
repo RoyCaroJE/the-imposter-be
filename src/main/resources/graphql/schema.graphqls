@@ -1,0 +1,7 @@
+type Mutation {
+    createRoom(roomName: String!, numImpostors: Int!, playerName: String!): ResultWithCountForRoomDTO!
+}
+
+type Query {
+    sample: Boolean
+}
