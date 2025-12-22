@@ -1,3 +1,14 @@
 spring:
   application:
     name: theimposter
+
+  profiles:
+    active: local
+
+server:
+  port: ${PORT:8080}
+
+logging:
+  level:
+    root: INFO
+    com.roycaroje.theimposter: DEBUG
