@@ -1,19 +1,26 @@
 spring:
+  config:
+    activate:
+      on-profile: local
+  application:
+    name: theimposter
   datasource:
     url: jdbc:postgresql://localhost:5432/theimposter
     username: postgres
-    password: postgres
+    password: password
     driver-class-name: org.postgresql.Driver
-
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
     properties:
       hibernate:
-        format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
   graphql:
     graphiql:
       enabled: true
@@ -22,3 +29,4 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.flywaydb: TRACE
