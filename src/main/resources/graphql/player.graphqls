@@ -1,0 +1,10 @@
+type Player {
+    publicId: ID!
+    name: String!
+    admin: Boolean!
+    impostor: Boolean!
+    confirmed: Boolean!
+    connected: Boolean!
+    roomPublicId: ID!
+    created: String!
+}

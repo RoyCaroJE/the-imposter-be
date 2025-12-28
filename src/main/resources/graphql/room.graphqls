@@ -1,0 +1,14 @@
+type ResultWithCountForRoomDTO {
+    queryCount: Int!
+    result: [RoomDTO!]!
+}
+
+type RoomDTO {
+    publicId: ID!
+    code: String!
+    status: String!
+    adminPublicId: ID!
+    numImpostors: Int!
+    word: String!
+    created: String!
+}
