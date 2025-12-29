@@ -1,0 +1,10 @@
+type GameStartPayload {
+    roomPublicId: UUID!
+    playerPublicId: UUID!
+    word: String!
+}
+
+type GameEndPayload {
+    roomPublicId: UUID!
+    impostors: [UUID!]!
+}

@@ -2,9 +2,8 @@ package com.roycaroje.theimposter.service;
 
 import com.roycaroje.theimposter.graphql.ResultWithCountFor;
 import com.roycaroje.theimposter.graphql.RoomDTO;
-import com.roycaroje.theimposter.model.Player;
-import com.roycaroje.theimposter.model.Room;
-import com.roycaroje.theimposter.model.RoomStatus;
+import com.roycaroje.theimposter.model.*;
+import com.roycaroje.theimposter.publisher.GameEventPublisher;
 import com.roycaroje.theimposter.repository.PlayerRepository;
 import com.roycaroje.theimposter.repository.RoomRepository;
 import com.roycaroje.theimposter.transformer.RoomTransformer;
@@ -25,6 +24,7 @@ public class RoomService {
     private final RoomTransformer roomTransformer;
     private final PlayerService playerService;
     private final PlayerRepository playerRepository;
+    private final GameEventPublisher publisher;
 
     public ResultWithCountFor<RoomDTO> createRoom(String roomName, int numImpostors, String playerName) {
         Room room = roomTransformer.createBaseForNewRoom(roomName, numImpostors);
@@ -82,7 +82,18 @@ public class RoomService {
 
         roomRepository.save(room);
 
-        // 🔔 LATER: publish subscriptions per player here
+        for (Player player : players) {
+            String word =
+                    player.getImpostor() ? "IMPOSTOR" : room.getWord();
+
+            publisher.publish(
+                    new GameStartPayload(
+                            room.getPublicId(),
+                            player.getPublicId(),
+                            word
+                    )
+            );
+        }
     }
 
     private void assignImpostors(List<Player> players, int numImpostors) {
@@ -110,8 +121,18 @@ public class RoomService {
         room.setStatus(RoomStatus.ENDED);
         roomRepository.save(room);
 
-        // 🔔 publish "impostors revealed" subscription
+        List<Player> players = playerRepository.findByRoomPublicId(roomPublicId);
+
+        List<UUID> impostors = players.stream()
+                .filter(Player::getImpostor)
+                .map(Player::getPublicId)
+                .toList();
+
+        publisher.publish(
+                new GameEndPayload(room.getPublicId(), impostors)
+        );
     }
+
 
     public void restartGame(UUID roomPublicId, UUID adminPublicId) {
 
@@ -135,6 +156,10 @@ public class RoomService {
         room.setStartedAt(null);
 
         roomRepository.save(room);
+
+        publisher.publish(
+                new GameRestartedEvent(room.getPublicId())
+        );
     }
 
     private Room getRoom(UUID roomPublicId) {

@@ -17,5 +17,13 @@ type Query {
     getPlayersByRoom(roomPublicId: UUID!): [Player!]!
 }
 
+type Subscription {
+    gameStarted(roomPublicId: UUID!playerPublicId: UUID!): GameStartPayload!
+    gameEnded(roomPublicId: UUID!): GameEndPayload!
+    playersUpdated(roomPublicId: UUID!): [Player!]!
+    gameRestarted(roomPublicId: UUID!): Boolean!
+}
+
+
 scalar UUID
 scalar Instant

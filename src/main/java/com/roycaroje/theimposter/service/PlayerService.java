@@ -1,8 +1,10 @@
 package com.roycaroje.theimposter.service;
 
 import com.roycaroje.theimposter.model.Player;
+import com.roycaroje.theimposter.model.PlayersUpdatedEvent;
 import com.roycaroje.theimposter.model.Room;
 import com.roycaroje.theimposter.model.RoomStatus;
+import com.roycaroje.theimposter.publisher.GameEventPublisher;
 import com.roycaroje.theimposter.repository.PlayerRepository;
 import com.roycaroje.theimposter.repository.RoomRepository;
 import com.roycaroje.theimposter.transformer.PlayerTransformer;
@@ -19,6 +21,7 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
     private final PlayerTransformer playerTransformer;
     private final RoomRepository roomRepository;
+    private final GameEventPublisher publisher;
 
     public UUID createAdminPlayer(String playerName, UUID roomPublicId){
         Player player = playerTransformer.createAdminPlayer(playerName, roomPublicId);
@@ -42,6 +45,13 @@ public class PlayerService {
         player.setConnected(true);
 
         playerRepository.save(player);
+        publisher.publish(
+                new PlayersUpdatedEvent(
+                        room.getPublicId(),
+                        playerRepository.findByRoomPublicId(room.getPublicId())
+                )
+        );
+
         return player.getPublicId();
     }
 
@@ -53,6 +63,13 @@ public class PlayerService {
         }
 
         playerRepository.delete(player);
+        publisher.publish(
+                new PlayersUpdatedEvent(
+                        player.getRoomPublicId(),
+                        playerRepository.findByRoomPublicId(player.getRoomPublicId())
+                )
+        );
+
     }
 
     public void disconnectPlayer(UUID playerPublicId) {
@@ -61,6 +78,14 @@ public class PlayerService {
         player.setConnected(false);
 
         playerRepository.save(player);
+
+        publisher.publish(
+                new PlayersUpdatedEvent(
+                        player.getRoomPublicId(),
+                        playerRepository.findByRoomPublicId(player.getRoomPublicId())
+                )
+        );
+
     }
 
     public void reconnectPlayer(UUID playerPublicId) {
@@ -69,6 +94,14 @@ public class PlayerService {
         player.setConnected(true);
 
         playerRepository.save(player);
+
+        publisher.publish(
+                new PlayersUpdatedEvent(
+                        player.getRoomPublicId(),
+                        playerRepository.findByRoomPublicId(player.getRoomPublicId())
+                )
+        );
+
     }
 
     private Player getPlayer(UUID playerPublicId) {
