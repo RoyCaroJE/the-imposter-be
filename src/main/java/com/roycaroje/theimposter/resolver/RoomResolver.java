@@ -8,6 +8,8 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.stereotype.Controller;
 
+import java.util.UUID;
+
 @Controller
 @AllArgsConstructor
 public class RoomResolver {
@@ -15,7 +17,35 @@ public class RoomResolver {
     private final RoomService roomService;
 
     @MutationMapping
-    public ResultWithCountFor<RoomDTO> createRoom(@Argument String roomName, @Argument int numImpostors, @Argument String playerName) {
+    public ResultWithCountFor<RoomDTO> createRoom(
+            @Argument String roomName,
+            @Argument int numImpostors,
+            @Argument String playerName) {
         return roomService.createRoom(roomName, numImpostors, playerName);
     }
+
+    @MutationMapping
+    public Boolean startGame(
+            @Argument UUID roomPublicId,
+            @Argument UUID adminPublicId) {
+        roomService.startGame(roomPublicId, adminPublicId);
+        return true;
+    }
+
+    @MutationMapping
+    public Boolean endGame(
+            @Argument UUID roomPublicId,
+            @Argument UUID adminPublicId) {
+        roomService.endGame(roomPublicId, adminPublicId);
+        return true;
+    }
+
+    @MutationMapping
+    public Boolean restartGame(
+            @Argument UUID roomPublicId,
+            @Argument UUID adminPublicId) {
+        roomService.restartGame(roomPublicId, adminPublicId);
+        return true;
+    }
 }
+
