@@ -3,6 +3,7 @@ package com.roycaroje.theimposter.service;
 import com.roycaroje.theimposter.graphql.ResultWithCountFor;
 import com.roycaroje.theimposter.graphql.RoomDTO;
 import com.roycaroje.theimposter.model.Room;
+import com.roycaroje.theimposter.model.RoomStatus;
 import com.roycaroje.theimposter.repository.RoomRepository;
 import com.roycaroje.theimposter.transformer.RoomTransformer;
 import com.roycaroje.theimposter.util.CodeGenerator;
@@ -21,17 +22,25 @@ public class RoomService {
     private final PlayerService playerService;
 
     public ResultWithCountFor<RoomDTO> createRoom(String roomName, int numImpostors, String playerName) {
+
         Room room = roomTransformer.createBaseForNewRoom(roomName, numImpostors);
         room.setCode(setRoomCode());
         room.setWord(setRoomWord());
-        UUID adminPlayerPublicId = playerService.createAdminPlayer(playerName, room.getPublicId());
-        room.setAdminPublicId(adminPlayerPublicId);
+        room.setStatus(RoomStatus.CREATED);
+
+        roomRepository.save(room); // SAVE FIRST
+
+        UUID adminPublicId = playerService.createAdminPlayer(playerName, room.getPublicId());
+        room.setAdminPublicId(adminPublicId);
+
         roomRepository.save(room);
 
-        RoomDTO roomDTO = new RoomDTO();
-        roomTransformer.mapModelToDto(room, roomDTO);
-        return new ResultWithCountFor<>(List.of(roomDTO));
+        RoomDTO dto = new RoomDTO();
+        roomTransformer.mapModelToDto(room, dto);
+
+        return new ResultWithCountFor<>(List.of(dto));
     }
+
 
     private String setRoomCode(){
         String code;
