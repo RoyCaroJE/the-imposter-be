@@ -1,10 +1,15 @@
 type GameStartPayload {
-    roomPublicId: UUID!
-    playerPublicId: UUID!
+    roomPublicId: ID!
+    playerPublicId: ID!
     word: String!
 }
 
 type GameEndPayload {
-    roomPublicId: UUID!
-    impostors: [UUID!]!
+    roomPublicId: ID!
+    impostors: [ID!]!
+}
+
+type DiscussionStartedPayload {
+    roomPublicId: ID!
+    startingPlayerPublicId: ID!
 }

@@ -1,10 +1,10 @@
 type Player {
-    publicId: UUID!
+    publicId: ID!
     name: String!
     admin: Boolean!
     impostor: Boolean!
     confirmed: Boolean!
     connected: Boolean!
-    roomPublicId: UUID!
+    roomPublicId: ID!
     created: String!
 }

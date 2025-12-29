@@ -167,4 +167,28 @@ public class RoomService {
                 .orElseThrow(() -> new RuntimeException("Room not found"));
     }
 
+    public void startDiscussion(UUID roomPublicId, UUID adminPublicId) {
+
+        Room room = getRoom(roomPublicId);
+
+        if (!room.getAdminPublicId().equals(adminPublicId)) {
+            throw new RuntimeException("Only admin");
+        }
+
+        List<Player> players =
+                playerRepository.findByRoomPublicId(roomPublicId);
+
+        if (!players.stream().allMatch(Player::getConfirmed)) {
+            throw new RuntimeException("Not all players ready");
+        }
+
+        Collections.shuffle(players);
+        UUID starter = players.get(0).getPublicId();
+
+        publisher.publish(
+                new DiscussionStartedPayload(roomPublicId, starter)
+        );
+    }
+
+
 }

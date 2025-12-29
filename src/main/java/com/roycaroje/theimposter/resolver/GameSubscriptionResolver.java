@@ -31,6 +31,21 @@ public class GameSubscriptionResolver {
     }
 
     @SubscriptionMapping
+    public Flux<Boolean> allPlayersReady(@Argument UUID roomPublicId) {
+        return publisher.flux()
+                .ofType(Boolean.class);
+    }
+
+    @SubscriptionMapping
+    public Flux<DiscussionStartedPayload> discussionStarted(
+            @Argument UUID roomPublicId) {
+
+        return publisher.flux()
+                .ofType(DiscussionStartedPayload.class)
+                .filter(e -> e.getRoomPublicId().equals(roomPublicId));
+    }
+
+    @SubscriptionMapping
     public Flux<GameEndPayload> gameEnded(
             @Argument UUID roomPublicId) {
 

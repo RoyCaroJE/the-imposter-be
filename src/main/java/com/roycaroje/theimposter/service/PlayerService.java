@@ -117,4 +117,26 @@ public class PlayerService {
         return playerRepository.findByRoomPublicIdAndConfirmedTrue(roomPublicId);
     }
 
+    public void playerReady(UUID playerPublicId) {
+
+        Player player = getPlayer(playerPublicId);
+        player.setConfirmed(true);
+        playerRepository.save(player);
+
+        List<Player> players =
+                playerRepository.findByRoomPublicId(player.getRoomPublicId());
+
+        publisher.publish(
+                new PlayersUpdatedEvent(player.getRoomPublicId(), players)
+        );
+
+        boolean allReady = players.stream()
+                .allMatch(Player::getConfirmed);
+
+        if (allReady) {
+            publisher.publish(true);
+        }
+    }
+
+
 }

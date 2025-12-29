@@ -1,29 +1,29 @@
 type Mutation {
     # Room
-    startGame(roomPublicId: UUID!adminPublicId: UUID!): Boolean!
-    endGame(roomPublicId: UUID!adminPublicId: UUID!): Boolean!
-    restartGame(roomPublicId: UUID!adminPublicId: UUID!): Boolean!
+    createRoom(roomName: String!, numImpostors: Int!, playerName: String!): ResultWithCountForRoomDTO!
+    startGame(roomPublicId: ID!, adminPublicId: ID!): Boolean!
+    endGame(roomPublicId: ID!, adminPublicId: ID!): Boolean!
+    restartGame(roomPublicId: ID!, adminPublicId: ID!): Boolean!
 
     # Player
-    joinRoom(roomCode: String!playerName: String!): UUID!
-    leaveRoom(playerPublicId: UUID!): Boolean!
-    disconnectPlayer(playerPublicId: UUID!): Boolean!
-    reconnectPlayer(playerPublicId: UUID!): Boolean!
+    joinRoom(roomCode: String!, playerName: String!): ID!
+    leaveRoom(playerPublicId: ID!): Boolean!
+    disconnectPlayer(playerPublicId: ID!): Boolean!
+    reconnectPlayer(playerPublicId: ID!): Boolean!
+    playerReady(playerPublicId: ID!): Boolean!
 }
 
 type Query {
     getRoomByCode(roomCode: String!): RoomDTO
-    getRoomByPublicId(roomPublicId: UUID!): RoomDTO
-    getPlayersByRoom(roomPublicId: UUID!): [Player!]!
+    getRoomByPublicId(roomPublicId: ID!): RoomDTO
+    getPlayersByRoom(roomPublicId: ID!): [Player!]!
 }
 
 type Subscription {
-    gameStarted(roomPublicId: UUID!playerPublicId: UUID!): GameStartPayload!
-    gameEnded(roomPublicId: UUID!): GameEndPayload!
-    playersUpdated(roomPublicId: UUID!): [Player!]!
-    gameRestarted(roomPublicId: UUID!): Boolean!
+    gameStarted(roomPublicId: ID!, playerPublicId: ID!): GameStartPayload!
+    allPlayersReady(roomPublicId: ID!): Boolean!
+    discussionStarted(roomPublicId: ID!): DiscussionStartedPayload!
+    gameEnded(roomPublicId: ID!): GameEndPayload!
+    playersUpdated(roomPublicId: ID!): [Player!]!
+    gameRestarted(roomPublicId: ID!): Boolean!
 }
-
-
-scalar UUID
-scalar Instant

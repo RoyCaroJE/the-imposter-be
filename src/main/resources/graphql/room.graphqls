@@ -4,10 +4,10 @@ type ResultWithCountForRoomDTO {
 }
 
 type RoomDTO {
-    publicId: UUID!
+    publicId: ID!
     code: String!
     status: String!
-    adminPublicId: UUID!
+    adminPublicId: ID!
     numImpostors: Int!
     word: String!
     created: String!

@@ -38,5 +38,11 @@ public class PlayerResolver {
         playerService.reconnectPlayer(playerPublicId);
         return true;
     }
+
+    @MutationMapping
+    public Boolean playerReady(@Argument UUID playerPublicId) {
+        playerService.playerReady(playerPublicId);
+        return true;
+    }
 }
 

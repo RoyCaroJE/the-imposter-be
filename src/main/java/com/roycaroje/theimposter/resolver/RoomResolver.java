@@ -33,6 +33,14 @@ public class RoomResolver {
     }
 
     @MutationMapping
+    public Boolean startDiscussion(
+            @Argument UUID roomPublicId,
+            @Argument UUID adminPublicId) {
+        roomService.startDiscussion(roomPublicId, adminPublicId);
+        return true;
+    }
+
+    @MutationMapping
     public Boolean endGame(
             @Argument UUID roomPublicId,
             @Argument UUID adminPublicId) {
