@@ -1,8 +1,10 @@
-package com.roycaroje.theimposter.graphql;
+package com.roycaroje.theimposter.graphql.room;
 
+import com.roycaroje.theimposter.graphql.player.PlayerDTO;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -10,9 +12,8 @@ import java.util.UUID;
 public class RoomDTO {
     private UUID publicId;
     private String code;
-    private String status;
     private UUID adminPublicId;
     private int numImpostors;
-    private String word;
-    private String created;
+    private List<PlayerDTO> players;
 }
+

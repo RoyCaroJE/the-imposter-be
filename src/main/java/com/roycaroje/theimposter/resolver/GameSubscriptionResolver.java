@@ -1,5 +1,6 @@
 package com.roycaroje.theimposter.resolver;
 
+import com.roycaroje.theimposter.graphql.player.*;
 import com.roycaroje.theimposter.model.*;
 import com.roycaroje.theimposter.publisher.GameEventPublisher;
 import lombok.AllArgsConstructor;

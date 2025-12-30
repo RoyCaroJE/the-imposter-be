@@ -1,4 +1,4 @@
-package com.roycaroje.theimposter.model;
+package com.roycaroje.theimposter.graphql.player;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

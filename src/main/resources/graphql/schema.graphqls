@@ -2,21 +2,20 @@ type Mutation {
     # Room
     createRoom(roomName: String!, numImpostors: Int!, playerName: String!): ResultWithCountForRoomDTO!
     startGame(roomPublicId: ID!, adminPublicId: ID!): Boolean!
+    startDiscussion(roomPublicId: ID!): Boolean!
     endGame(roomPublicId: ID!, adminPublicId: ID!): Boolean!
     restartGame(roomPublicId: ID!, adminPublicId: ID!): Boolean!
 
     # Player
-    joinRoom(roomCode: String!, playerName: String!): ID!
+    joinRoom(roomCode: String!, playerName: String!): ResultWithCountForRoomDTO!
+    playerReady(playerPublicId: ID!): Boolean!
     leaveRoom(playerPublicId: ID!): Boolean!
     disconnectPlayer(playerPublicId: ID!): Boolean!
     reconnectPlayer(playerPublicId: ID!): Boolean!
-    playerReady(playerPublicId: ID!): Boolean!
 }
 
 type Query {
-    getRoomByCode(roomCode: String!): RoomDTO
-    getRoomByPublicId(roomPublicId: ID!): RoomDTO
-    getPlayersByRoom(roomPublicId: ID!): [Player!]!
+    getRoomByCode(roomCode: String!): ResultWithCountForRoomDTO!
 }
 
 type Subscription {

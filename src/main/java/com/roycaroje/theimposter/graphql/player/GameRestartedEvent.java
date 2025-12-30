@@ -1,4 +1,4 @@
-package com.roycaroje.theimposter.model;
+package com.roycaroje.theimposter.graphql.player;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,9 +7,6 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class GameStartPayload {
+public class GameRestartedEvent {
     private UUID roomPublicId;
-    private UUID playerPublicId;
-    private String word;
 }
-

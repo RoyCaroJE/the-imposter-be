@@ -1,7 +1,9 @@
 package com.roycaroje.theimposter.service;
 
-import com.roycaroje.theimposter.graphql.ResultWithCountFor;
-import com.roycaroje.theimposter.graphql.RoomDTO;
+import com.roycaroje.theimposter.graphql.*;
+import com.roycaroje.theimposter.graphql.player.*;
+import com.roycaroje.theimposter.graphql.room.RoomDTO;
+import com.roycaroje.theimposter.graphql.room.RoomStatus;
 import com.roycaroje.theimposter.model.*;
 import com.roycaroje.theimposter.publisher.GameEventPublisher;
 import com.roycaroje.theimposter.repository.PlayerRepository;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,24 +30,23 @@ public class RoomService {
     private final GameEventPublisher publisher;
 
     public ResultWithCountFor<RoomDTO> createRoom(String roomName, int numImpostors, String playerName) {
+        if(roomName.isBlank() || playerName.isBlank()){
+            throw new IllegalArgumentException("Room name or player name cannot be empty");
+        }
         Room room = roomTransformer.createBaseForNewRoom(roomName, numImpostors);
         room.setCode(setRoomCode());
-        room.setWord(setRoomWord());
-        room.setStatus(RoomStatus.CREATED);
-
-        roomRepository.save(room); // SAVE FIRST
-
+        room.setWord(setRoomWord()); // TODO Implement different words and languages
+        room.setStatus(RoomStatus.CREATED.toString());
         UUID adminPublicId = playerService.createAdminPlayer(playerName, room.getPublicId());
         room.setAdminPublicId(adminPublicId);
 
         roomRepository.save(room);
 
         RoomDTO dto = new RoomDTO();
-        roomTransformer.mapModelToDto(room, dto);
+        roomTransformer.mapModelToDto(room, dto, playerName);
 
         return new ResultWithCountFor<>(List.of(dto));
     }
-
 
     private String setRoomCode(){
         String code;
@@ -55,7 +57,7 @@ public class RoomService {
     }
 
     private String setRoomWord(){
-        return "test";
+        return "test"; // TODO Implement words logic
     }
 
     public void startGame(UUID roomPublicId, UUID adminPublicId) {
@@ -65,7 +67,7 @@ public class RoomService {
             throw new RuntimeException("Only admin can start game");
         }
 
-        if (!RoomStatus.CREATED.equals(room.getStatus())) {
+        if (!RoomStatus.CREATED.toString().equals(room.getStatus())) {
             throw new RuntimeException("Game already started");
         }
 
@@ -77,14 +79,13 @@ public class RoomService {
 
         assignImpostors(players, room.getNumImpostors());
 
-        room.setStatus(RoomStatus.STARTED);
+        room.setStatus(RoomStatus.STARTED.toString());
         room.setStartedAt(Instant.now());
 
         roomRepository.save(room);
 
         for (Player player : players) {
-            String word =
-                    player.getImpostor() ? "IMPOSTOR" : room.getWord();
+            String word = player.getImpostor() ? "IMPOSTOR" : room.getWord();
 
             publisher.publish(
                     new GameStartPayload(
@@ -114,11 +115,11 @@ public class RoomService {
             throw new RuntimeException("Only admin can end game");
         }
 
-        if (!RoomStatus.STARTED.equals(room.getStatus())) {
+        if (!RoomStatus.STARTED.toString().equals(room.getStatus())) {
             throw new RuntimeException("Game not started");
         }
 
-        room.setStatus(RoomStatus.ENDED);
+        room.setStatus(RoomStatus.ENDED.toString());
         roomRepository.save(room);
 
         List<Player> players = playerRepository.findByRoomPublicId(roomPublicId);
@@ -152,7 +153,7 @@ public class RoomService {
         playerRepository.saveAll(players);
 
         room.setWord(setRoomWord());
-        room.setStatus(RoomStatus.CREATED);
+        room.setStatus(RoomStatus.CREATED.toString());
         room.setStartedAt(null);
 
         roomRepository.save(room);
@@ -190,5 +191,24 @@ public class RoomService {
         );
     }
 
+    public ResultWithCountFor<RoomDTO> getRoomByCode(String roomCode){
+        if(roomCode.isBlank()){
+            throw new IllegalArgumentException("Room code cannot be empty");
+        }
+
+        Optional<Room> optionalRoom = roomRepository.findByCode(roomCode);
+        if(optionalRoom.isEmpty()){
+            throw new RuntimeException("Room with this code doesn't exist");
+        }
+        Room room = optionalRoom.get();
+        RoomDTO dto = new RoomDTO();
+        dto.setPublicId(room.getPublicId());
+        dto.setCode(room.getCode());
+        dto.setNumImpostors(room.getNumImpostors());
+        dto.setAdminPublicId(room.getAdminPublicId());
+        List<PlayerDTO> players = playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId());
+        dto.setPlayers(players);
+        return new ResultWithCountFor<>(List.of(dto));
+    }
 
 }

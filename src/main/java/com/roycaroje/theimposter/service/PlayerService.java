@@ -1,9 +1,9 @@
 package com.roycaroje.theimposter.service;
 
 import com.roycaroje.theimposter.model.Player;
-import com.roycaroje.theimposter.model.PlayersUpdatedEvent;
+import com.roycaroje.theimposter.graphql.player.PlayersUpdatedEvent;
 import com.roycaroje.theimposter.model.Room;
-import com.roycaroje.theimposter.model.RoomStatus;
+import com.roycaroje.theimposter.graphql.room.RoomStatus;
 import com.roycaroje.theimposter.publisher.GameEventPublisher;
 import com.roycaroje.theimposter.repository.PlayerRepository;
 import com.roycaroje.theimposter.repository.RoomRepository;
@@ -34,7 +34,7 @@ public class PlayerService {
         Room room = roomRepository.findByCode(roomCode)
                 .orElseThrow(() -> new RuntimeException("Room not found"));
 
-        if (!RoomStatus.CREATED.equals(room.getStatus())) {
+        if (!RoomStatus.CREATED.toString().equals(room.getStatus())) {
             throw new RuntimeException("Game already started");
         }
 

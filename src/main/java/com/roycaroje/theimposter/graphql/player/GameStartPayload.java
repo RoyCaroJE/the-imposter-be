@@ -1,15 +1,15 @@
-package com.roycaroje.theimposter.model;
+package com.roycaroje.theimposter.graphql.player;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.List;
 import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class GameEndPayload {
+public class GameStartPayload {
     private UUID roomPublicId;
-    private List<UUID> impostors;
+    private UUID playerPublicId;
+    private String word;
 }
 
