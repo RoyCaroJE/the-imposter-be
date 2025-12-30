@@ -18,11 +18,8 @@ public class RoomResolver {
     private final RoomService roomService;
 
     @MutationMapping
-    public ResultWithCountFor<RoomDTO> createRoom(
-            @Argument String roomName,
-            @Argument int numImpostors,
-            @Argument String playerName) {
-        return roomService.createRoom(roomName, numImpostors, playerName);
+    public ResultWithCountFor<RoomDTO> createRoom(@Argument int numImpostors, @Argument String playerName) {
+        return roomService.createRoom(numImpostors, playerName);
     }
 
     @MutationMapping

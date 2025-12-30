@@ -29,11 +29,12 @@ public class RoomService {
     private final PlayerRepository playerRepository;
     private final GameEventPublisher publisher;
 
-    public ResultWithCountFor<RoomDTO> createRoom(String roomName, int numImpostors, String playerName) {
-        if(roomName.isBlank() || playerName.isBlank()){
-            throw new IllegalArgumentException("Room name or player name cannot be empty");
+    public ResultWithCountFor<RoomDTO> createRoom(int numImpostors, String playerName) {
+        if(playerName.isBlank()){
+            throw new IllegalArgumentException("Player name cannot be empty");
         }
-        Room room = roomTransformer.createBaseForNewRoom(roomName, numImpostors);
+
+        Room room = roomTransformer.createBaseForNewRoom(numImpostors);
         room.setCode(setRoomCode());
         room.setWord(setRoomWord()); // TODO Implement different words and languages
         room.setStatus(RoomStatus.CREATED.toString());

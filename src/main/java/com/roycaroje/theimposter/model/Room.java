@@ -1,4 +1,5 @@
 package com.roycaroje.theimposter.model;
+import com.roycaroje.theimposter.graphql.room.RoomStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.Instant;
@@ -20,10 +21,9 @@ public class Room extends BaseEntity {
     private String code;
 
     @Column(nullable = false)
-    private String status = "CREATED";
+    private String status = RoomStatus.CREATED.toString();
     private UUID adminPublicId;
     private Integer numImpostors;
     private String word;
     private Instant startedAt;
-    private String roomName;
 }

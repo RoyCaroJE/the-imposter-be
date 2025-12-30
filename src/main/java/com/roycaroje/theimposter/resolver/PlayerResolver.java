@@ -1,5 +1,7 @@
 package com.roycaroje.theimposter.resolver;
 
+import com.roycaroje.theimposter.graphql.ResultWithCountFor;
+import com.roycaroje.theimposter.graphql.room.RoomDTO;
 import com.roycaroje.theimposter.service.PlayerService;
 import lombok.AllArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -15,9 +17,7 @@ public class PlayerResolver {
     private final PlayerService playerService;
 
     @MutationMapping
-    public UUID joinRoom(
-            @Argument String roomCode,
-            @Argument String playerName) {
+    public ResultWithCountFor<RoomDTO> joinRoom(@Argument String roomCode, @Argument String playerName) {
         return playerService.joinRoom(playerName, roomCode);
     }
 

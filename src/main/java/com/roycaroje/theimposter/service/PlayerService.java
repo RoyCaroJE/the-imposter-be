@@ -1,5 +1,8 @@
 package com.roycaroje.theimposter.service;
 
+import com.roycaroje.theimposter.graphql.ResultWithCountFor;
+import com.roycaroje.theimposter.graphql.player.PlayerDTO;
+import com.roycaroje.theimposter.graphql.room.RoomDTO;
 import com.roycaroje.theimposter.model.Player;
 import com.roycaroje.theimposter.graphql.player.PlayersUpdatedEvent;
 import com.roycaroje.theimposter.model.Room;
@@ -29,10 +32,12 @@ public class PlayerService {
         return player.getPublicId();
     }
 
-    public UUID joinRoom(String playerName, String roomCode) {
+    public ResultWithCountFor<RoomDTO> joinRoom(String playerName, String roomCode) {
+        if(playerName.isBlank() || roomCode.isBlank()){
+            throw new IllegalArgumentException("Player name and Room Code cannot be empty");
+        }
 
-        Room room = roomRepository.findByCode(roomCode)
-                .orElseThrow(() -> new RuntimeException("Room not found"));
+        Room room = roomRepository.findByCode(roomCode).orElseThrow(() -> new RuntimeException("Room not found"));
 
         if (!RoomStatus.CREATED.toString().equals(room.getStatus())) {
             throw new RuntimeException("Game already started");
@@ -52,7 +57,15 @@ public class PlayerService {
                 )
         );
 
-        return player.getPublicId();
+        RoomDTO roomDTO = new RoomDTO();
+        roomDTO.setPublicId(room.getPublicId());
+        roomDTO.setCode(roomCode);
+        roomDTO.setNumImpostors(room.getNumImpostors());
+        roomDTO.setAdminPublicId(room.getAdminPublicId());
+        List<PlayerDTO> players = playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId());
+        roomDTO.setPlayers(players);
+
+        return new ResultWithCountFor<>(List.of(roomDTO));
     }
 
     public void leaveRoom(UUID playerPublicId) {

@@ -13,12 +13,11 @@ import java.util.UUID;
 @Component
 public class RoomTransformer {
 
-    public Room createBaseForNewRoom(String roomName, int numImpostors){
+    public Room createBaseForNewRoom(int numImpostors){
         Room room = new Room();
         room.setPublicId(UUID.randomUUID());
         room.setStatus(RoomStatus.CREATED.toString());
         room.setNumImpostors(numImpostors);
-        room.setRoomName(roomName);
         room.setCreated(Instant.now());
         return room;
     }
