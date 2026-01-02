@@ -56,9 +56,7 @@ public class GameSubscriptionResolver {
     }
 
     @SubscriptionMapping
-    public Flux<List<Player>> playersUpdated(
-            @Argument UUID roomPublicId) {
-
+    public Flux<List<Player>> playersUpdated(@Argument UUID roomPublicId) {
         return publisher.flux()
                 .ofType(PlayersUpdatedEvent.class)
                 .filter(e -> e.getRoomPublicId().equals(roomPublicId))

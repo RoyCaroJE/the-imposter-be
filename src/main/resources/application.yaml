@@ -19,6 +19,8 @@ spring:
   graphql:
     graphiql:
       enabled: false
+    websocket:
+      path: /graphql
 
 server:
   forward-headers-strategy: framework
