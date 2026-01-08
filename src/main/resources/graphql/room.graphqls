@@ -8,6 +8,7 @@ type RoomDTO {
     code: String!
     adminPublicId: ID!
     numImpostors: Int!
+    joinedPlayerPublicId: ID!
     players: [PlayerDTO!]!
 }
 

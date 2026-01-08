@@ -2,6 +2,8 @@ package com.roycaroje.theimposter.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -19,9 +21,10 @@ public class Player extends BaseEntity {
     @Column(length = 100, nullable = false)
     private String name;
 
-    private Boolean admin = false;
-    private Boolean impostor = false;
-    private Boolean confirmed = false;
-    private Boolean connected = true;
+    private boolean admin = false;
+    private boolean impostor = false;
+    private boolean confirmed = false;
+    private boolean connected = true;
     private UUID roomPublicId;
+    private Instant lastSeen;
 }

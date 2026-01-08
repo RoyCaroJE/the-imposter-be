@@ -12,6 +12,9 @@ type Mutation {
     leaveRoom(playerPublicId: ID!): Boolean!
     disconnectPlayer(playerPublicId: ID!): Boolean!
     reconnectPlayer(playerPublicId: ID!): Boolean!
+
+    # Heartbeat
+    playerHeartbeat(playerPublicId: ID!): Boolean!
 }
 
 type Query {

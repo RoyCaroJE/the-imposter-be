@@ -19,6 +19,7 @@ public class PlayerTransformer {
         player.setImpostor(false);
         player.setConfirmed(false);
         player.setCreated(Instant.now());
+        player.setLastSeen(Instant.now());
         return player;
     }
 }

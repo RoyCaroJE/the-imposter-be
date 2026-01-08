@@ -86,7 +86,7 @@ public class RoomService {
         roomRepository.save(room);
 
         for (Player player : players) {
-            String word = player.getImpostor() ? "IMPOSTOR" : room.getWord();
+            String word = player.isImpostor() ? "IMPOSTOR" : room.getWord();
 
             publisher.publish(
                     new GameStartPayload(
@@ -126,7 +126,7 @@ public class RoomService {
         List<Player> players = playerRepository.findByRoomPublicId(roomPublicId);
 
         List<UUID> impostors = players.stream()
-                .filter(Player::getImpostor)
+                .filter(Player::isImpostor)
                 .map(Player::getPublicId)
                 .toList();
 
@@ -180,7 +180,7 @@ public class RoomService {
         List<Player> players =
                 playerRepository.findByRoomPublicId(roomPublicId);
 
-        if (!players.stream().allMatch(Player::getConfirmed)) {
+        if (!players.stream().allMatch(Player::isConfirmed)) {
             throw new RuntimeException("Not all players ready");
         }
 

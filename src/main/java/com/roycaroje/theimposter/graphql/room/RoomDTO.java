@@ -14,6 +14,7 @@ public class RoomDTO {
     private String code;
     private UUID adminPublicId;
     private int numImpostors;
+    private UUID joinedPlayerPublicId;
     private List<PlayerDTO> players;
 }
 

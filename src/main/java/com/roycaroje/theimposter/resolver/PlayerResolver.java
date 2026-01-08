@@ -44,5 +44,10 @@ public class PlayerResolver {
         playerService.playerReady(playerPublicId);
         return true;
     }
+
+    @MutationMapping
+    public boolean playerHeartbeat(@Argument UUID playerPublicId) {
+        return playerService.playerHeartbeat(playerPublicId);
+    }
 }
 
