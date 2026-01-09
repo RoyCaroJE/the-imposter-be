@@ -93,13 +93,17 @@ public class PlayerService {
         return new ResultWithCountFor<>(List.of(roomDTO));
     }
 
-    public List<Player> getPlayersByRoom(UUID roomPublicId) {
-        return playerRepository.findByRoomPublicId(roomPublicId);
-    }
+    public boolean playerReady(UUID playerPublicId) {
+        Player player = playerRepository.findByPublicId(playerPublicId).orElseThrow(() -> new RuntimeException("Player Not Found: " + playerPublicId));
 
-    public List<Player> getConfirmedPlayers(UUID roomPublicId) {
-        return playerRepository.findByRoomPublicIdAndConfirmedTrue(roomPublicId);
-    }
+        player.setConfirmed(!player.isConfirmed());
+        player.setLastSeen(Instant.now());
+        player.setConnected(true);
+        playerRepository.save(player);
 
+        publisher.publish(new PlayersUpdatedEvent(player.getRoomPublicId(), playerRepository.findByRoomPublicId(player.getRoomPublicId())));
+
+        return true;
+    }
 
 }

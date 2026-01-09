@@ -30,6 +30,7 @@ public class PlayerTransformer {
         player.setRoomPublicId(roomPublicId);
         player.setAdmin(false);
         player.setConnected(true);
+        player.setConfirmed(false);
         player.setLastSeen(Instant.now());
         return player;
     }

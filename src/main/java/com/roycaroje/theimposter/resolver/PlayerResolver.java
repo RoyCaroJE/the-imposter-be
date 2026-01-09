@@ -28,6 +28,11 @@ public class PlayerResolver {
         return playerService.playerHeartbeat(playerPublicId);
     }
 
+    @MutationMapping
+    public boolean playerReady(@Argument UUID playerPublicId) {
+        return playerService.playerReady(playerPublicId);
+    }
+
     // QUERIES
 }
 
