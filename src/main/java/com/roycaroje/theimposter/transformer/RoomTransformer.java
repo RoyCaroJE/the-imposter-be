@@ -30,6 +30,10 @@ public class RoomTransformer {
         PlayerDTO playerDTO = new PlayerDTO();
         playerDTO.setPublicId(model.getAdminPublicId());
         playerDTO.setName(playerName);
+        playerDTO.setConfirmed(false);
+        playerDTO.setConnected(true);
+        playerDTO.setAdmin(true);
+        playerDTO.setRoomPublicId(model.getPublicId());
         dto.setPlayers(List.of(playerDTO));
         dto.setJoinedPlayerPublicId(model.getAdminPublicId());
     }

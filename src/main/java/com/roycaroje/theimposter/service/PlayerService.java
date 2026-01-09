@@ -33,7 +33,8 @@ public class PlayerService {
     private static final Duration TIMEOUT = Duration.ofSeconds(30);
 
     @Scheduled(fixedRate = 5_000)
-    public void updatePresence() {
+    // Every 5 seconds we check all connected players and we disconnect them if they're not
+    public void updatePlayerPresence() {
         Instant limit = Instant.now().minus(TIMEOUT);
 
         List<Player> players = playerRepository.findByConnectedTrue();
@@ -42,20 +43,13 @@ public class PlayerService {
             if (player.getLastSeen() == null || player.getLastSeen().isBefore(limit)) {
                 player.setConnected(false);
                 playerRepository.save(player);
-
-                publisher.publish(
-                        new PlayersUpdatedEvent(
-                                player.getRoomPublicId(),
-                                playerRepository.findByRoomPublicId(player.getRoomPublicId())
-                        )
-                );
+                publisher.publish(new PlayersUpdatedEvent(player.getRoomPublicId(), playerRepository.findByRoomPublicId(player.getRoomPublicId())));
             }
         }
     }
 
     public boolean playerHeartbeat(UUID playerPublicId) {
-        Player player = playerRepository.findByPublicId(playerPublicId)
-                .orElseThrow(() -> new RuntimeException("Player not found"));
+        Player player = playerRepository.findByPublicId(playerPublicId).orElseThrow(() -> new RuntimeException("Player not found"));
 
         player.setLastSeen(Instant.now());
         player.setConnected(true);
@@ -82,21 +76,10 @@ public class PlayerService {
             throw new RuntimeException("Game already started");
         }
 
-        Player player = new Player();
-        player.setPublicId(UUID.randomUUID());
-        player.setName(playerName);
-        player.setRoomPublicId(room.getPublicId());
-        player.setAdmin(false);
-        player.setConnected(true);
-        player.setLastSeen(Instant.now());
+        Player player = playerTransformer.createBasicPlayer(playerName, room.getPublicId());
 
         player = playerRepository.save(player);
-        publisher.publish(
-                new PlayersUpdatedEvent(
-                        room.getPublicId(),
-                        playerRepository.findByRoomPublicId(room.getPublicId())
-                )
-        );
+        publisher.publish(new PlayersUpdatedEvent(room.getPublicId(), playerRepository.findByRoomPublicId(room.getPublicId())));
 
         RoomDTO roomDTO = new RoomDTO();
         roomDTO.setPublicId(room.getPublicId());
@@ -110,87 +93,12 @@ public class PlayerService {
         return new ResultWithCountFor<>(List.of(roomDTO));
     }
 
-    public void leaveRoom(UUID playerPublicId) {
-        Player player = getPlayer(playerPublicId);
-
-        if (player.isAdmin()) {
-            throw new RuntimeException("Admin cannot leave room");
-        }
-
-        playerRepository.delete(player);
-        publisher.publish(
-                new PlayersUpdatedEvent(
-                        player.getRoomPublicId(),
-                        playerRepository.findByRoomPublicId(player.getRoomPublicId())
-                )
-        );
-
-    }
-
-    public void disconnectPlayer(UUID playerPublicId) {
-
-        Player player = getPlayer(playerPublicId);
-        player.setConnected(false);
-
-        playerRepository.save(player);
-
-        publisher.publish(
-                new PlayersUpdatedEvent(
-                        player.getRoomPublicId(),
-                        playerRepository.findByRoomPublicId(player.getRoomPublicId())
-                )
-        );
-
-    }
-
-    public void reconnectPlayer(UUID playerPublicId) {
-
-        Player player = getPlayer(playerPublicId);
-        player.setConnected(true);
-
-        playerRepository.save(player);
-
-        publisher.publish(
-                new PlayersUpdatedEvent(
-                        player.getRoomPublicId(),
-                        playerRepository.findByRoomPublicId(player.getRoomPublicId())
-                )
-        );
-
-    }
-
-    private Player getPlayer(UUID playerPublicId) {
-        return playerRepository.findByPublicId(playerPublicId)
-                .orElseThrow(() -> new RuntimeException("Player not found"));
-    }
-
     public List<Player> getPlayersByRoom(UUID roomPublicId) {
         return playerRepository.findByRoomPublicId(roomPublicId);
     }
 
     public List<Player> getConfirmedPlayers(UUID roomPublicId) {
         return playerRepository.findByRoomPublicIdAndConfirmedTrue(roomPublicId);
-    }
-
-    public void playerReady(UUID playerPublicId) {
-
-        Player player = getPlayer(playerPublicId);
-        player.setConfirmed(true);
-        playerRepository.save(player);
-
-        List<Player> players =
-                playerRepository.findByRoomPublicId(player.getRoomPublicId());
-
-        publisher.publish(
-                new PlayersUpdatedEvent(player.getRoomPublicId(), players)
-        );
-
-        boolean allReady = players.stream()
-                .allMatch(Player::isConfirmed);
-
-        if (allReady) {
-            publisher.publish(true);
-        }
     }
 
 

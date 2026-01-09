@@ -1,17 +1,9 @@
 type Mutation {
     # Room
     createRoom(numImpostors: Int!, playerName: String!): ResultWithCountForRoomDTO!
-    startGame(roomPublicId: ID!, adminPublicId: ID!): Boolean!
-    startDiscussion(roomPublicId: ID!): Boolean!
-    endGame(roomPublicId: ID!, adminPublicId: ID!): Boolean!
-    restartGame(roomPublicId: ID!, adminPublicId: ID!): Boolean!
 
     # Player
     joinRoom(roomCode: String!, playerName: String!): ResultWithCountForRoomDTO!
-    playerReady(playerPublicId: ID!): Boolean!
-    leaveRoom(playerPublicId: ID!): Boolean!
-    disconnectPlayer(playerPublicId: ID!): Boolean!
-    reconnectPlayer(playerPublicId: ID!): Boolean!
 
     # Heartbeat
     playerHeartbeat(playerPublicId: ID!): Boolean!
@@ -22,10 +14,5 @@ type Query {
 }
 
 type Subscription {
-    gameStarted(roomPublicId: ID!, playerPublicId: ID!): GameStartPayload!
-    allPlayersReady(roomPublicId: ID!): Boolean!
-    discussionStarted(roomPublicId: ID!): DiscussionStartedPayload!
-    gameEnded(roomPublicId: ID!): GameEndPayload!
-    playersUpdated(roomPublicId: ID!): [Player!]!
-    gameRestarted(roomPublicId: ID!): Boolean!
+    playersUpdated(roomPublicId: ID!): [PlayerDTO!]!
 }

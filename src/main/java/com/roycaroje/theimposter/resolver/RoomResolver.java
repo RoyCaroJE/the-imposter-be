@@ -17,42 +17,14 @@ public class RoomResolver {
 
     private final RoomService roomService;
 
+    // MUTATIONS
+
     @MutationMapping
     public ResultWithCountFor<RoomDTO> createRoom(@Argument int numImpostors, @Argument String playerName) {
         return roomService.createRoom(numImpostors, playerName);
     }
 
-    @MutationMapping
-    public Boolean startGame(
-            @Argument UUID roomPublicId,
-            @Argument UUID adminPublicId) {
-        roomService.startGame(roomPublicId, adminPublicId);
-        return true;
-    }
-
-    @MutationMapping
-    public Boolean startDiscussion(
-            @Argument UUID roomPublicId,
-            @Argument UUID adminPublicId) {
-        roomService.startDiscussion(roomPublicId, adminPublicId);
-        return true;
-    }
-
-    @MutationMapping
-    public Boolean endGame(
-            @Argument UUID roomPublicId,
-            @Argument UUID adminPublicId) {
-        roomService.endGame(roomPublicId, adminPublicId);
-        return true;
-    }
-
-    @MutationMapping
-    public Boolean restartGame(
-            @Argument UUID roomPublicId,
-            @Argument UUID adminPublicId) {
-        roomService.restartGame(roomPublicId, adminPublicId);
-        return true;
-    }
+    // QUERIES
 
     @QueryMapping
     public ResultWithCountFor<RoomDTO> getRoomByCode(@Argument String roomCode){

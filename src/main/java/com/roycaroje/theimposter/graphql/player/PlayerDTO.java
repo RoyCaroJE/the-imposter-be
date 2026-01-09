@@ -14,4 +14,8 @@ import java.util.UUID;
 public class PlayerDTO {
     private UUID publicId;
     private String name;
+    private boolean admin;
+    private boolean confirmed;
+    private boolean connected;
+    private UUID roomPublicId;
 }

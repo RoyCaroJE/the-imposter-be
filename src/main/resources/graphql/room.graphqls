@@ -11,8 +11,3 @@ type RoomDTO {
     joinedPlayerPublicId: ID!
     players: [PlayerDTO!]!
 }
-
-type PlayerDTO {
-    publicId: ID!
-    name: String!
-}

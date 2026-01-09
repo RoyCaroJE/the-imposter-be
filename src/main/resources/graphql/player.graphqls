@@ -1,10 +1,13 @@
-type Player {
+type ResultWithCountForPlayerDTO {
+    queryCount: Int!
+    result: [PlayerDTO!]!
+}
+
+type PlayerDTO {
     publicId: ID!
     name: String!
     admin: Boolean!
-    impostor: Boolean!
     confirmed: Boolean!
     connected: Boolean!
     roomPublicId: ID!
-    created: String!
 }

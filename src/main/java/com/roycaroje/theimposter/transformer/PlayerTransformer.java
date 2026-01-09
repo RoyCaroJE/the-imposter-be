@@ -22,4 +22,15 @@ public class PlayerTransformer {
         player.setLastSeen(Instant.now());
         return player;
     }
+
+    public Player createBasicPlayer(String playerName, UUID roomPublicId){
+        Player player = new Player();
+        player.setPublicId(UUID.randomUUID());
+        player.setName(playerName);
+        player.setRoomPublicId(roomPublicId);
+        player.setAdmin(false);
+        player.setConnected(true);
+        player.setLastSeen(Instant.now());
+        return player;
+    }
 }
