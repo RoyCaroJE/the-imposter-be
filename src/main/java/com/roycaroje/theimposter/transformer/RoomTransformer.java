@@ -1,32 +1,40 @@
 package com.roycaroje.theimposter.transformer;
 
-import com.roycaroje.theimposter.graphql.RoomDTO;
+import com.roycaroje.theimposter.graphql.player.PlayerDTO;
+import com.roycaroje.theimposter.graphql.room.RoomDTO;
+import com.roycaroje.theimposter.graphql.room.RoomStatus;
 import com.roycaroje.theimposter.model.Room;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Component
 public class RoomTransformer {
 
-    public Room createBaseForNewRoom(String roomName, int numImpostors){
+    public Room createBaseForNewRoom(int numImpostors){
         Room room = new Room();
         room.setPublicId(UUID.randomUUID());
-        room.setStatus("CREATED");
+        room.setStatus(RoomStatus.CREATED.toString());
         room.setNumImpostors(numImpostors);
-        room.setRoomName(roomName);
         room.setCreated(Instant.now());
         return room;
     }
 
-    public void mapModelToDto(Room model, RoomDTO dto){
+    public void mapModelToDto(Room model, RoomDTO dto, String playerName){
         dto.setCode(model.getCode());
-        dto.setWord(model.getWord());
         dto.setAdminPublicId(model.getAdminPublicId());
-        dto.setStatus(model.getStatus());
         dto.setPublicId(model.getPublicId());
         dto.setNumImpostors(model.getNumImpostors());
-        dto.setCreated(model.getCreated().toString());
+        PlayerDTO playerDTO = new PlayerDTO();
+        playerDTO.setPublicId(model.getAdminPublicId());
+        playerDTO.setName(playerName);
+        playerDTO.setConfirmed(false);
+        playerDTO.setConnected(true);
+        playerDTO.setAdmin(true);
+        playerDTO.setRoomPublicId(model.getPublicId());
+        dto.setPlayers(List.of(playerDTO));
+        dto.setJoinedPlayerPublicId(model.getAdminPublicId());
     }
 }

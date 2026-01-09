@@ -1,0 +1,2 @@
+ALTER TABLE player
+    ADD COLUMN last_seen TIMESTAMP DEFAULT NOW();

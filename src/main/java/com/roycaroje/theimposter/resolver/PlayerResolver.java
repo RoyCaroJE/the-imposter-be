@@ -1,12 +1,33 @@
 package com.roycaroje.theimposter.resolver;
 
+import com.roycaroje.theimposter.graphql.ResultWithCountFor;
+import com.roycaroje.theimposter.graphql.room.RoomDTO;
 import com.roycaroje.theimposter.service.PlayerService;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.stereotype.Controller;
 
-@Component
+import java.util.UUID;
+
+@Controller
 @AllArgsConstructor
 public class PlayerResolver {
 
     private final PlayerService playerService;
+
+    // MUTATIONS
+
+    @MutationMapping
+    public ResultWithCountFor<RoomDTO> joinRoom(@Argument String roomCode, @Argument String playerName) {
+        return playerService.joinRoom(playerName, roomCode);
+    }
+
+    @MutationMapping
+    public boolean playerHeartbeat(@Argument UUID playerPublicId) {
+        return playerService.playerHeartbeat(playerPublicId);
+    }
+
+    // QUERIES
 }
+

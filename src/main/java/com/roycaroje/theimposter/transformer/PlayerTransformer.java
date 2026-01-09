@@ -19,6 +19,18 @@ public class PlayerTransformer {
         player.setImpostor(false);
         player.setConfirmed(false);
         player.setCreated(Instant.now());
+        player.setLastSeen(Instant.now());
+        return player;
+    }
+
+    public Player createBasicPlayer(String playerName, UUID roomPublicId){
+        Player player = new Player();
+        player.setPublicId(UUID.randomUUID());
+        player.setName(playerName);
+        player.setRoomPublicId(roomPublicId);
+        player.setAdmin(false);
+        player.setConnected(true);
+        player.setLastSeen(Instant.now());
         return player;
     }
 }

@@ -1,7 +1,18 @@
 type Mutation {
-    createRoom(roomName: String!, numImpostors: Int!, playerName: String!): ResultWithCountForRoomDTO!
+    # Room
+    createRoom(numImpostors: Int!, playerName: String!): ResultWithCountForRoomDTO!
+
+    # Player
+    joinRoom(roomCode: String!, playerName: String!): ResultWithCountForRoomDTO!
+
+    # Heartbeat
+    playerHeartbeat(playerPublicId: ID!): Boolean!
 }
 
 type Query {
-    sample: Boolean
+    getRoomByCode(roomCode: String!): ResultWithCountForRoomDTO!
+}
+
+type Subscription {
+    playersUpdated(roomPublicId: ID!): [PlayerDTO!]!
 }

@@ -6,9 +6,8 @@ type ResultWithCountForRoomDTO {
 type RoomDTO {
     publicId: ID!
     code: String!
-    status: String!
     adminPublicId: ID!
     numImpostors: Int!
-    word: String!
-    created: String!
+    joinedPlayerPublicId: ID!
+    players: [PlayerDTO!]!
 }
