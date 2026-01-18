@@ -6,6 +6,7 @@ type Mutation {
     joinRoom(roomCode: String!, playerName: String!): ResultWithCountForRoomDTO!
     playerReady(playerPublicId: ID!): Boolean!
     leaveRoom(playerPublicId: ID!): Boolean!
+    kickPlayer(playerPublicId: ID!): Boolean!
 
     # Heartbeat
     playerHeartbeat(playerPublicId: ID!): Boolean!

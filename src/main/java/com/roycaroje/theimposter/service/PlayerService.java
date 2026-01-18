@@ -130,4 +130,19 @@ public class PlayerService {
         return true;
     }
 
+    @Transactional
+    public boolean kickPlayer(UUID playerPublicId) {
+        Player player = playerRepository.findByPublicId(playerPublicId).orElseThrow(() -> new RuntimeException("Player Not Found: " + playerPublicId));
+        boolean deletedPlayerIsAdmin = player.isAdmin();
+        if(deletedPlayerIsAdmin){
+            throw new RuntimeException("Admin cannot be kicked!");
+        }
+        playerRepository.delete(player);
+        List<Player> playersLeft = playerRepository.findByRoomPublicId(player.getRoomPublicId());
+
+        publisher.publish(new PlayersUpdatedEvent(player.getRoomPublicId(), playersLeft));
+
+        return true;
+    }
+
 }
