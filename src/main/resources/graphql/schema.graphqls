@@ -17,5 +17,5 @@ type Query {
 }
 
 type Subscription {
-    playersUpdated(roomPublicId: ID!): [PlayerDTO!]!
+    roomStatus(roomPublicId: ID!): RoomStatusDTO!
 }

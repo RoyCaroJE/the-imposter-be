@@ -8,9 +8,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.SubscriptionMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
-import reactor.util.concurrent.Queues;
 
-import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -20,11 +18,10 @@ public class GameSubscriptionResolver {
     private final GameEventPublisher publisher;
 
     @SubscriptionMapping
-    public Flux<List<Player>> playersUpdated(@Argument UUID roomPublicId) {
+    public Flux<RoomStatusDTO> roomStatus(@Argument UUID roomPublicId) {
         return publisher.flux()
-                .ofType(PlayersUpdatedEvent.class)
-                .filter(e -> e.getRoomPublicId().equals(roomPublicId))
-                .map(PlayersUpdatedEvent::getPlayers);
+                .ofType(RoomStatusDTO.class)
+                .filter(e -> e.getRoomPublicId().equals(roomPublicId));
     }
 }
 

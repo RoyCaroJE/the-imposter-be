@@ -3,10 +3,14 @@ package com.roycaroje.theimposter.graphql.player;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.List;
 import java.util.UUID;
 
-@AllArgsConstructor @Getter
-public class DiscussionStartedPayload {
+@Getter
+@AllArgsConstructor
+public class RoomStatusDTO {
     private UUID roomPublicId;
-    private UUID startingPlayerPublicId;
+    private GameStatus status;
+    private List<PlayerDTO> players;
 }
+

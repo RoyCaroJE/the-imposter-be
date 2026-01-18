@@ -15,8 +15,6 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
 
     List<Player> findByRoomPublicId(UUID roomPublicId);
 
-    List<Player> findByRoomPublicIdAndConfirmedTrue(UUID roomPublicId);
-
     @Query("SELECT new com.roycaroje.theimposter.graphql.player.PlayerDTO(p.publicId, p.name, p.admin, p.confirmed, p.connected, p.roomPublicId) FROM Player p WHERE p.roomPublicId = :roomPublicId")
     List<PlayerDTO> findPlayersDTOByRoomPublicId(UUID roomPublicId);
 

@@ -3,7 +3,6 @@ package com.roycaroje.theimposter.service;
 import com.roycaroje.theimposter.graphql.*;
 import com.roycaroje.theimposter.graphql.player.*;
 import com.roycaroje.theimposter.graphql.room.RoomDTO;
-import com.roycaroje.theimposter.graphql.room.RoomStatus;
 import com.roycaroje.theimposter.model.*;
 import com.roycaroje.theimposter.publisher.GameEventPublisher;
 import com.roycaroje.theimposter.repository.PlayerRepository;
@@ -13,8 +12,6 @@ import com.roycaroje.theimposter.util.CodeGenerator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,7 +34,7 @@ public class RoomService {
         Room room = roomTransformer.createBaseForNewRoom(numImpostors);
         room.setCode(setRoomCode());
         room.setWord(setRoomWord()); // TODO Implement different words and languages
-        room.setStatus(RoomStatus.CREATED.toString());
+        room.setStatus(GameStatus.WAITING.toString());
         UUID adminPublicId = playerService.createAdminPlayer(playerName, room.getPublicId());
         room.setAdminPublicId(adminPublicId);
 

@@ -1,12 +1,12 @@
 package com.roycaroje.theimposter.service;
 
 import com.roycaroje.theimposter.graphql.ResultWithCountFor;
+import com.roycaroje.theimposter.graphql.player.GameStatus;
 import com.roycaroje.theimposter.graphql.player.PlayerDTO;
 import com.roycaroje.theimposter.graphql.room.RoomDTO;
 import com.roycaroje.theimposter.model.Player;
-import com.roycaroje.theimposter.graphql.player.PlayersUpdatedEvent;
+import com.roycaroje.theimposter.graphql.player.RoomStatusDTO;
 import com.roycaroje.theimposter.model.Room;
-import com.roycaroje.theimposter.graphql.room.RoomStatus;
 import com.roycaroje.theimposter.publisher.GameEventPublisher;
 import com.roycaroje.theimposter.repository.PlayerRepository;
 import com.roycaroje.theimposter.repository.RoomRepository;
@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -44,7 +43,7 @@ public class PlayerService {
             if (player.getLastSeen() == null || player.getLastSeen().isBefore(limit)) {
                 player.setConnected(false);
                 playerRepository.save(player);
-                publisher.publish(new PlayersUpdatedEvent(player.getRoomPublicId(), playerRepository.findByRoomPublicId(player.getRoomPublicId())));
+                publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
             }
         }
     }
@@ -73,14 +72,14 @@ public class PlayerService {
 
         Room room = roomRepository.findByCode(roomCode).orElseThrow(() -> new RuntimeException("Room not found"));
 
-        if (!RoomStatus.CREATED.toString().equals(room.getStatus())) {
+        if (!GameStatus.WAITING.toString().equals(room.getStatus())) {
             throw new RuntimeException("Game already started");
         }
 
         Player player = playerTransformer.createBasicPlayer(playerName, room.getPublicId());
 
         player = playerRepository.save(player);
-        publisher.publish(new PlayersUpdatedEvent(room.getPublicId(), playerRepository.findByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
 
         RoomDTO roomDTO = new RoomDTO();
         roomDTO.setPublicId(room.getPublicId());
@@ -102,7 +101,7 @@ public class PlayerService {
         player.setConnected(true);
         playerRepository.save(player);
 
-        publisher.publish(new PlayersUpdatedEvent(player.getRoomPublicId(), playerRepository.findByRoomPublicId(player.getRoomPublicId())));
+        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
 
         return true;
     }
@@ -112,20 +111,20 @@ public class PlayerService {
         Player player = playerRepository.findByPublicId(playerPublicId).orElseThrow(() -> new RuntimeException("Player Not Found: " + playerPublicId));
         boolean deletedPlayerWasAdmin = player.isAdmin();
         playerRepository.delete(player);
-        List<Player> playersLeft = playerRepository.findByRoomPublicId(player.getRoomPublicId());
+        List<PlayerDTO> playersLeft = playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId());
 
         if(playersLeft.isEmpty()){
             Room room = roomRepository.findByPublicId(player.getRoomPublicId()).orElseThrow(() -> new RuntimeException("Error while deleting the room: " + player.getRoomPublicId()));
             roomRepository.delete(room);
         } else {
             if(deletedPlayerWasAdmin) {
-                Player randomPlayer = playersLeft.getFirst();
+                Player randomPlayer = playerRepository.findByPublicId(playersLeft.getFirst().getPublicId()).orElseThrow(() -> new RuntimeException("Player not found"));
                 randomPlayer.setAdmin(true);
                 playerRepository.save(randomPlayer);
             }
         }
 
-        publisher.publish(new PlayersUpdatedEvent(player.getRoomPublicId(), playersLeft));
+        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, playersLeft));
 
         return true;
     }
@@ -138,9 +137,9 @@ public class PlayerService {
             throw new RuntimeException("Admin cannot be kicked!");
         }
         playerRepository.delete(player);
-        List<Player> playersLeft = playerRepository.findByRoomPublicId(player.getRoomPublicId());
+        List<PlayerDTO> playersLeft = playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId());
 
-        publisher.publish(new PlayersUpdatedEvent(player.getRoomPublicId(), playersLeft));
+        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, playersLeft));
 
         return true;
     }
