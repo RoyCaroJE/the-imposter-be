@@ -33,6 +33,11 @@ public class PlayerResolver {
         return playerService.playerReady(playerPublicId);
     }
 
+    @MutationMapping
+    public boolean leaveRoom(@Argument UUID playerPublicId) {
+        return playerService.leaveRoom(playerPublicId);
+    }
+
     // QUERIES
 }
 

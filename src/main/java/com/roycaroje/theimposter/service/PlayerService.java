@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -102,6 +103,29 @@ public class PlayerService {
         playerRepository.save(player);
 
         publisher.publish(new PlayersUpdatedEvent(player.getRoomPublicId(), playerRepository.findByRoomPublicId(player.getRoomPublicId())));
+
+        return true;
+    }
+
+    @Transactional
+    public boolean leaveRoom(UUID playerPublicId) {
+        Player player = playerRepository.findByPublicId(playerPublicId).orElseThrow(() -> new RuntimeException("Player Not Found: " + playerPublicId));
+        boolean deletedPlayerWasAdmin = player.isAdmin();
+        playerRepository.delete(player);
+        List<Player> playersLeft = playerRepository.findByRoomPublicId(player.getRoomPublicId());
+
+        if(playersLeft.isEmpty()){
+            Room room = roomRepository.findByPublicId(player.getRoomPublicId()).orElseThrow(() -> new RuntimeException("Error while deleting the room: " + player.getRoomPublicId()));
+            roomRepository.delete(room);
+        } else {
+            if(deletedPlayerWasAdmin) {
+                Player randomPlayer = playersLeft.getFirst();
+                randomPlayer.setAdmin(true);
+                playerRepository.save(randomPlayer);
+            }
+        }
+
+        publisher.publish(new PlayersUpdatedEvent(player.getRoomPublicId(), playersLeft));
 
         return true;
     }
