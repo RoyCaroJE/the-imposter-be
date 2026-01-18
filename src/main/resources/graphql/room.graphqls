@@ -11,3 +11,14 @@ type RoomDTO {
     joinedPlayerPublicId: ID!
     players: [PlayerDTO!]!
 }
+
+type RoomStatusDTO {
+    status: GameStatus!
+    players: [PlayerDTO!]!
+}
+
+enum GameStatus {
+    WAITING
+    STARTED
+    PLAYING
+}
