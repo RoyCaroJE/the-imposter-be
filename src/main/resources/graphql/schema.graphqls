@@ -7,6 +7,7 @@ type Mutation {
     playerReady(playerPublicId: ID!): Boolean!
     leaveRoom(playerPublicId: ID!): Boolean!
     kickPlayer(playerPublicId: ID!): Boolean!
+    startGame(roomPublicId: ID!): Boolean!
 
     # Heartbeat
     playerHeartbeat(playerPublicId: ID!): Boolean!
