@@ -38,6 +38,11 @@ public class PlayerResolver {
         return playerService.leaveRoom(playerPublicId);
     }
 
+    @MutationMapping
+    public boolean kickPlayer(@Argument UUID playerPublicId) {
+        return playerService.kickPlayer(playerPublicId);
+    }
+
     // QUERIES
 }
 
