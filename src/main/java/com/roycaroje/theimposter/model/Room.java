@@ -25,4 +25,5 @@ public class Room extends BaseEntity {
     private UUID adminPublicId;
     private Integer numImpostors;
     private Instant startedAt;
+    private String language;
 }

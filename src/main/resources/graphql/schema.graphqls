@@ -1,6 +1,6 @@
 type Mutation {
     # Room
-    createRoom(numImpostors: Int!, playerName: String!): ResultWithCountForRoomDTO!
+    createRoom(numImpostors: Int!, playerName: String!, language: String!): ResultWithCountForRoomDTO!
     startGame(roomPublicId: ID!): Boolean!
     startDiscussion(roomPublicId: ID!): Boolean!
     finishDiscussion(roomPublicId: ID!): Boolean!
