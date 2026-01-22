@@ -11,3 +11,12 @@ type PlayerDTO {
     connected: Boolean!
     roomPublicId: ID!
 }
+
+type ResultWithCountForPlayerWordDTO {
+    queryCount: Int!
+    result: [PlayerWordDTO!]!
+}
+
+type PlayerWordDTO {
+    word: String!
+}

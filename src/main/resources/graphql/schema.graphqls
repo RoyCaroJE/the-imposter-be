@@ -15,6 +15,7 @@ type Mutation {
 
 type Query {
     getRoomByCode(roomCode: String!): ResultWithCountForRoomDTO!
+    getPlayerWord(playerPublicId: ID!): ResultWithCountForPlayerWordDTO!
 }
 
 type Subscription {

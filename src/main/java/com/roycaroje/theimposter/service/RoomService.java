@@ -99,8 +99,10 @@ public class RoomService {
         for(Player player : players){
             if (imposters.contains(player)) {
                 player.setImpostor(true);
+                player.setConfirmed(false);
                 player.setWord("IMPOSTER");
             } else {
+                player.setConfirmed(false);
                 player.setWord(wordForThisRound);
                 player.setImpostor(false);
             }
