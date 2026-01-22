@@ -110,7 +110,7 @@ public class RoomService {
         room.setStartedAt(Instant.now());
         room = roomRepository.save(room);
 
-        String wordForThisRound = setRoomWord("en");
+        String wordForThisRound = setRoomWord(room.getLanguage());
         List<Player> imposters = pickRandomPlayers(players, numberOfImposters);
 
         for(Player player : players){
