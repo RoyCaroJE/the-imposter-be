@@ -95,6 +95,9 @@ public class RoomService {
 
         String wordForThisRound = setRoomWord();
         List<Player> imposters = pickRandomPlayers(players, numberOfImposters);
+        List<Player> randomList = new ArrayList<>(List.copyOf(players));
+        Collections.shuffle(randomList);
+        String startingPlayer = randomList.getFirst().getName();
 
         for(Player player : players){
             if (imposters.contains(player)) {
@@ -110,7 +113,7 @@ public class RoomService {
 
         playerRepository.saveAll(players);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, startingPlayer, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 

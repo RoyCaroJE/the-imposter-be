@@ -11,6 +11,7 @@ import java.util.UUID;
 public class RoomStatusDTO {
     private UUID roomPublicId;
     private GameStatus status;
+    private String startingPlayer;
     private List<PlayerDTO> players;
 }
 

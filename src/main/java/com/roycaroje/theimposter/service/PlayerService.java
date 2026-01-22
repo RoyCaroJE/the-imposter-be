@@ -44,7 +44,7 @@ public class PlayerService {
             if (player.getLastSeen() == null || player.getLastSeen().isBefore(limit)) {
                 player.setConnected(false);
                 playerRepository.save(player);
-                publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
+                publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, null, playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
             }
         }
     }
@@ -80,7 +80,7 @@ public class PlayerService {
         Player player = playerTransformer.createBasicPlayer(playerName, room.getPublicId());
 
         player = playerRepository.save(player);
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
 
         RoomDTO roomDTO = new RoomDTO();
         roomDTO.setPublicId(room.getPublicId());
@@ -103,7 +103,7 @@ public class PlayerService {
         player.setConnected(true);
         playerRepository.save(player);
 
-        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.valueOf(room.getStatus()), playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
+        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.valueOf(room.getStatus()), null, playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
 
         return true;
     }
@@ -126,7 +126,7 @@ public class PlayerService {
             }
         }
 
-        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, playersLeft));
+        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, null, playersLeft));
 
         return true;
     }
@@ -141,7 +141,7 @@ public class PlayerService {
         playerRepository.delete(player);
         List<PlayerDTO> playersLeft = playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId());
 
-        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, playersLeft));
+        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, null, playersLeft));
 
         return true;
     }
