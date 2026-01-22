@@ -1,0 +1,2 @@
+ALTER TABLE room
+    ADD COLUMN language VARCHAR(2) NOT NULL;

@@ -13,6 +13,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.util.*;
 
@@ -25,13 +29,17 @@ public class RoomService {
     private final PlayerService playerService;
     private final PlayerRepository playerRepository;
     private final GameEventPublisher publisher;
+    private static final HttpClient client = HttpClient.newHttpClient();
 
-    public ResultWithCountFor<RoomDTO> createRoom(int numImpostors, String playerName) {
+    public ResultWithCountFor<RoomDTO> createRoom(int numImpostors, String playerName, String language) {
         if(playerName.isBlank()){
             throw new IllegalArgumentException("Player name cannot be empty");
         }
+        if(!(language.equals("es") || language.equals("en"))){
+            throw new IllegalArgumentException("Incorrect language: " + language);
+        }
 
-        Room room = roomTransformer.createBaseForNewRoom(numImpostors);
+        Room room = roomTransformer.createBaseForNewRoom(numImpostors, language);
         room.setCode(setRoomCode());
         room.setStatus(GameStatus.WAITING.toString());
         UUID adminPublicId = playerService.createAdminPlayer(playerName, room.getPublicId());
@@ -53,8 +61,17 @@ public class RoomService {
         return code;
     }
 
-    private String setRoomWord(){
-        return "test"; // TODO Implement words logic
+    private String setRoomWord(String language) {
+        try {
+            String url = "https://random-word-api.herokuapp.com/word?lang=" + language;
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            String body = response.body();
+            return body.replace("[\"", "").replace("\"]", "");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public ResultWithCountFor<RoomDTO> getRoomByCode(String roomCode){
@@ -93,7 +110,7 @@ public class RoomService {
         room.setStartedAt(Instant.now());
         room = roomRepository.save(room);
 
-        String wordForThisRound = setRoomWord();
+        String wordForThisRound = setRoomWord(room.getLanguage());
         List<Player> imposters = pickRandomPlayers(players, numberOfImposters);
 
         for(Player player : players){

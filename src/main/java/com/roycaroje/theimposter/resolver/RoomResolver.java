@@ -20,8 +20,8 @@ public class RoomResolver {
     // MUTATIONS
 
     @MutationMapping
-    public ResultWithCountFor<RoomDTO> createRoom(@Argument int numImpostors, @Argument String playerName) {
-        return roomService.createRoom(numImpostors, playerName);
+    public ResultWithCountFor<RoomDTO> createRoom(@Argument int numImpostors, @Argument String playerName, @Argument String language) {
+        return roomService.createRoom(numImpostors, playerName, language);
     }
 
     @MutationMapping
