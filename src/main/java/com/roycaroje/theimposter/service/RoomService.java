@@ -148,7 +148,7 @@ public class RoomService {
         Collections.shuffle(randomList);
         String startingPlayer = randomList.getFirst().getName();
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, startingPlayer, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.PLAYING, startingPlayer, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
