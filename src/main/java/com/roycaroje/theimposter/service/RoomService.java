@@ -95,9 +95,6 @@ public class RoomService {
 
         String wordForThisRound = setRoomWord();
         List<Player> imposters = pickRandomPlayers(players, numberOfImposters);
-        List<Player> randomList = new ArrayList<>(List.copyOf(players));
-        Collections.shuffle(randomList);
-        String startingPlayer = randomList.getFirst().getName();
 
         for(Player player : players){
             if (imposters.contains(player)) {
@@ -113,7 +110,7 @@ public class RoomService {
 
         playerRepository.saveAll(players);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, startingPlayer, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, null, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
@@ -127,6 +124,51 @@ public class RoomService {
 
         Collections.shuffle(mutableCopy);
         return mutableCopy.subList(0, n);
+    }
+
+    @Transactional
+    public boolean startDiscussion(UUID roomPublicId) {
+        Room room = roomRepository.findByPublicId(roomPublicId).orElseThrow(() -> new RuntimeException("Room not found: " + roomPublicId));
+        List<Player> players = playerRepository.findByRoomPublicId(roomPublicId);
+        boolean allPlayersAreReady = players.stream().allMatch(Player::isConfirmed);
+        if (!allPlayersAreReady) {
+            throw new IllegalArgumentException("Not all players are ready!");
+        }
+
+        for(Player player : players){
+            player.setConfirmed(false);
+        }
+        playerRepository.saveAll(players);
+
+        room.setStatus(GameStatus.PLAYING.toString());
+        room.setStartedAt(Instant.now());
+        room = roomRepository.save(room);
+
+        List<Player> randomList = new ArrayList<>(List.copyOf(players));
+        Collections.shuffle(randomList);
+        String startingPlayer = randomList.getFirst().getName();
+
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, startingPlayer, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        return true;
+    }
+
+    @Transactional
+    public boolean finishDiscussion(UUID roomPublicId) {
+        Room room = roomRepository.findByPublicId(roomPublicId).orElseThrow(() -> new RuntimeException("Room not found: " + roomPublicId));
+        List<Player> players = playerRepository.findByRoomPublicId(roomPublicId);
+
+        for(Player player : players){
+            player.setImpostor(false);
+            player.setConfirmed(false);
+        }
+        playerRepository.saveAll(players);
+
+        room.setStatus(GameStatus.WAITING.toString());
+        room.setStartedAt(null);
+        room = roomRepository.save(room);
+
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        return true;
     }
 
 }

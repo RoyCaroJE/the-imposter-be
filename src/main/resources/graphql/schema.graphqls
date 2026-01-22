@@ -1,13 +1,15 @@
 type Mutation {
     # Room
     createRoom(numImpostors: Int!, playerName: String!): ResultWithCountForRoomDTO!
+    startGame(roomPublicId: ID!): Boolean!
+    startDiscussion(roomPublicId: ID!): Boolean!
+    finishDiscussion(roomPublicId: ID!): Boolean!
 
     # Player
     joinRoom(roomCode: String!, playerName: String!): ResultWithCountForRoomDTO!
     playerReady(playerPublicId: ID!): Boolean!
     leaveRoom(playerPublicId: ID!): Boolean!
     kickPlayer(playerPublicId: ID!): Boolean!
-    startGame(roomPublicId: ID!): Boolean!
 
     # Heartbeat
     playerHeartbeat(playerPublicId: ID!): Boolean!
