@@ -19,5 +19,8 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
     List<PlayerDTO> findPlayersDTOByRoomPublicId(UUID roomPublicId);
 
     List<Player> findByConnectedTrue();
+
+    @Query("SELECT p.word FROM Player p WHERE p.publicId = :playerPublicId")
+    String findWordByPlayerPublicId(UUID playerPublicId);
 }
 

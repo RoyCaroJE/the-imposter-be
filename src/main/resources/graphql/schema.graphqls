@@ -1,6 +1,9 @@
 type Mutation {
     # Room
     createRoom(numImpostors: Int!, playerName: String!): ResultWithCountForRoomDTO!
+    startGame(roomPublicId: ID!): Boolean!
+    startDiscussion(roomPublicId: ID!): Boolean!
+    finishDiscussion(roomPublicId: ID!): Boolean!
 
     # Player
     joinRoom(roomCode: String!, playerName: String!): ResultWithCountForRoomDTO!
@@ -14,6 +17,7 @@ type Mutation {
 
 type Query {
     getRoomByCode(roomCode: String!): ResultWithCountForRoomDTO!
+    getPlayerWord(playerPublicId: ID!): ResultWithCountForPlayerWordDTO!
 }
 
 type Subscription {

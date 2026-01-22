@@ -3,6 +3,7 @@ package com.roycaroje.theimposter.service;
 import com.roycaroje.theimposter.graphql.ResultWithCountFor;
 import com.roycaroje.theimposter.graphql.player.GameStatus;
 import com.roycaroje.theimposter.graphql.player.PlayerDTO;
+import com.roycaroje.theimposter.graphql.player.PlayerWordDTO;
 import com.roycaroje.theimposter.graphql.room.RoomDTO;
 import com.roycaroje.theimposter.model.Player;
 import com.roycaroje.theimposter.graphql.player.RoomStatusDTO;
@@ -43,7 +44,7 @@ public class PlayerService {
             if (player.getLastSeen() == null || player.getLastSeen().isBefore(limit)) {
                 player.setConnected(false);
                 playerRepository.save(player);
-                publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
+                publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, null, playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
             }
         }
     }
@@ -79,7 +80,7 @@ public class PlayerService {
         Player player = playerTransformer.createBasicPlayer(playerName, room.getPublicId());
 
         player = playerRepository.save(player);
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
 
         RoomDTO roomDTO = new RoomDTO();
         roomDTO.setPublicId(room.getPublicId());
@@ -95,13 +96,14 @@ public class PlayerService {
 
     public boolean playerReady(UUID playerPublicId) {
         Player player = playerRepository.findByPublicId(playerPublicId).orElseThrow(() -> new RuntimeException("Player Not Found: " + playerPublicId));
+        Room room = roomRepository.findByPublicId(player.getRoomPublicId()).orElseThrow(() -> new RuntimeException("Room Not Found: " + player.getRoomPublicId()));
 
         player.setConfirmed(!player.isConfirmed());
         player.setLastSeen(Instant.now());
         player.setConnected(true);
         playerRepository.save(player);
 
-        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
+        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.valueOf(room.getStatus()), null, playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
 
         return true;
     }
@@ -124,7 +126,7 @@ public class PlayerService {
             }
         }
 
-        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, playersLeft));
+        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, null, playersLeft));
 
         return true;
     }
@@ -139,9 +141,21 @@ public class PlayerService {
         playerRepository.delete(player);
         List<PlayerDTO> playersLeft = playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId());
 
-        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, playersLeft));
+        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, null, playersLeft));
 
         return true;
+    }
+
+    public ResultWithCountFor<PlayerWordDTO> getPlayerWord(UUID playerPublicId){
+        String word = playerRepository.findWordByPlayerPublicId(playerPublicId);
+
+        if(word == null || word.isBlank()){
+            throw new RuntimeException("Error fetching the word for player: " + playerPublicId);
+        }
+
+        PlayerWordDTO dto = new PlayerWordDTO(word);
+
+        return new ResultWithCountFor<>(List.of(dto));
     }
 
 }

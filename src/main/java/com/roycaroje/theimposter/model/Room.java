@@ -24,6 +24,5 @@ public class Room extends BaseEntity {
     private String status = GameStatus.WAITING.toString();
     private UUID adminPublicId;
     private Integer numImpostors;
-    private String word;
     private Instant startedAt;
 }

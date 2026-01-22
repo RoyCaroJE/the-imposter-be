@@ -27,4 +27,5 @@ public class Player extends BaseEntity {
     private boolean connected = true;
     private UUID roomPublicId;
     private Instant lastSeen;
+    private String word;
 }

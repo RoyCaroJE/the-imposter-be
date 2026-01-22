@@ -1,0 +1,2 @@
+ALTER TABLE player
+    ADD COLUMN word VARCHAR(100) NULL;

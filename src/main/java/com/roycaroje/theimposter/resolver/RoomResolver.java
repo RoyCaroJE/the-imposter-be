@@ -24,6 +24,21 @@ public class RoomResolver {
         return roomService.createRoom(numImpostors, playerName);
     }
 
+    @MutationMapping
+    public boolean startGame(@Argument UUID roomPublicId) {
+        return roomService.startGame(roomPublicId);
+    }
+
+    @MutationMapping
+    public boolean startDiscussion(@Argument UUID roomPublicId) {
+        return roomService.startDiscussion(roomPublicId);
+    }
+
+    @MutationMapping
+    public boolean finishDiscussion(@Argument UUID roomPublicId) {
+        return roomService.finishDiscussion(roomPublicId);
+    }
+
     // QUERIES
 
     @QueryMapping
