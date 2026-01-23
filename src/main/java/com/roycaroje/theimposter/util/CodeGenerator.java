@@ -6,7 +6,7 @@ public class CodeGenerator {
 
     private static final String CHARACTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     private static final SecureRandom RANDOM = new SecureRandom();
-    private static final int CODE_LENGTH = 4;
+    private static final int CODE_LENGTH = 3;
 
     public static String generateCode() {
         StringBuilder sb = new StringBuilder(CODE_LENGTH);

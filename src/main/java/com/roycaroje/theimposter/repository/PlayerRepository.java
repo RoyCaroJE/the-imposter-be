@@ -5,6 +5,7 @@ import com.roycaroje.theimposter.model.Player;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,5 +23,7 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
 
     @Query("SELECT p.word FROM Player p WHERE p.publicId = :playerPublicId")
     String findWordByPlayerPublicId(UUID playerPublicId);
+
+    List<Player> findByRoomPublicIdIn(Collection<UUID> roomPublicIds);
 }
 
