@@ -34,7 +34,7 @@ public class PlayerService {
     private final RoomRepository roomRepository;
     private final GameEventPublisher publisher;
 
-    private static final Duration TIMEOUT = Duration.ofSeconds(30);
+    private static final Duration TIMEOUT = Duration.ofSeconds(15);
 
     @Scheduled(fixedRate = 5_000)
     // Every 5 seconds we check all connected players and we disconnect them if they're not
