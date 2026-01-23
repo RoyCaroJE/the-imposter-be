@@ -19,8 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -47,6 +50,62 @@ public class PlayerService {
                 publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, null, playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
             }
         }
+    }
+
+    @Transactional
+    @Scheduled(fixedRate = 5 * 60 * 1_000) // Every 5 minutes we check if there are empty rooms to delete
+    public void cleanEmptyRooms() {
+
+        Instant oneHourAgo = Instant.now().minus(1, ChronoUnit.HOURS);
+
+        List<Room> rooms = roomRepository.findByCreatedBefore(oneHourAgo);
+        if (rooms.isEmpty()) {
+            return;
+        }
+
+        List<UUID> roomPublicIds = rooms.stream()
+                .map(Room::getPublicId)
+                .toList();
+
+        List<Player> players = playerRepository.findByRoomPublicIdIn(roomPublicIds);
+
+        Map<UUID, List<Player>> playersByRoom = players.stream()
+                .collect(Collectors.groupingBy(Player::getRoomPublicId));
+
+        List<Room> roomsToDelete = rooms.stream()
+                .filter(room -> {
+                    List<Player> roomPlayers =
+                            playersByRoom.getOrDefault(room.getPublicId(), List.of());
+
+                    if (roomPlayers.isEmpty()) {
+                        return true;
+                    }
+
+                    return roomPlayers.stream().allMatch(player ->
+                            !player.isConnected()
+                                    && player.getLastSeen() != null
+                                    && player.getLastSeen().isBefore(oneHourAgo)
+                    );
+                })
+                .toList();
+
+        if (roomsToDelete.isEmpty()) {
+            return;
+        }
+
+        List<UUID> roomsToDeleteIds = roomsToDelete.stream()
+                .map(Room::getPublicId)
+                .toList();
+
+        List<Player> playersToDelete = players.stream()
+                .filter(p -> roomsToDeleteIds.contains(p.getRoomPublicId()))
+                .toList();
+
+        if (!playersToDelete.isEmpty()) {
+            playerRepository.deleteAll(playersToDelete);
+        }
+
+        roomRepository.deleteAll(roomsToDelete);
     }
 
     public boolean playerHeartbeat(UUID playerPublicId) {

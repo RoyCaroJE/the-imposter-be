@@ -117,7 +117,11 @@ public class RoomService {
             if (imposters.contains(player)) {
                 player.setImpostor(true);
                 player.setConfirmed(false);
-                player.setWord("IMPOSTER");
+                if(room.getLanguage().equals("es")){
+                    player.setWord("IMPOSTOR");
+                } else {
+                    player.setWord("IMPOSTER");
+                }
             } else {
                 player.setConfirmed(false);
                 player.setWord(wordForThisRound);
