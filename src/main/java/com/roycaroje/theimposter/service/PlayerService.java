@@ -44,10 +44,13 @@ public class PlayerService {
         List<Player> players = playerRepository.findByConnectedTrue();
 
         for (Player player : players) {
+            Room room = roomRepository.findByPublicId(player.getRoomPublicId()).orElseThrow();
             if (player.getLastSeen() == null || player.getLastSeen().isBefore(limit)) {
                 player.setConnected(false);
                 playerRepository.save(player);
-                publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, null, playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
+                if(GameStatus.WAITING.toString().equals(room.getStatus())){
+                    publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.valueOf(room.getStatus()), null, room.getLanguage(), room.getNumImpostors(), playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
+                }
             }
         }
     }
@@ -139,7 +142,7 @@ public class PlayerService {
         Player player = playerTransformer.createBasicPlayer(playerName, room.getPublicId());
 
         player = playerRepository.save(player);
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
 
         RoomDTO roomDTO = new RoomDTO();
         roomDTO.setPublicId(room.getPublicId());
@@ -162,7 +165,7 @@ public class PlayerService {
         player.setConnected(true);
         playerRepository.save(player);
 
-        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.valueOf(room.getStatus()), null, playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
+        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.valueOf(room.getStatus()), null, room.getLanguage(), room.getNumImpostors(), playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
 
         return true;
     }
@@ -170,12 +173,13 @@ public class PlayerService {
     @Transactional
     public boolean leaveRoom(UUID playerPublicId) {
         Player player = playerRepository.findByPublicId(playerPublicId).orElseThrow(() -> new RuntimeException("Player Not Found: " + playerPublicId));
+        Room room = roomRepository.findByPublicId(player.getRoomPublicId()).orElseThrow(() -> new RuntimeException("Room Not Found: " + player.getRoomPublicId()));
+
         boolean deletedPlayerWasAdmin = player.isAdmin();
         playerRepository.delete(player);
         List<PlayerDTO> playersLeft = playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId());
 
         if(playersLeft.isEmpty()){
-            Room room = roomRepository.findByPublicId(player.getRoomPublicId()).orElseThrow(() -> new RuntimeException("Error while deleting the room: " + player.getRoomPublicId()));
             roomRepository.delete(room);
         } else {
             if(deletedPlayerWasAdmin) {
@@ -185,7 +189,7 @@ public class PlayerService {
             }
         }
 
-        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, null, playersLeft));
+        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), playersLeft));
 
         return true;
     }
@@ -193,6 +197,8 @@ public class PlayerService {
     @Transactional
     public boolean kickPlayer(UUID playerPublicId) {
         Player player = playerRepository.findByPublicId(playerPublicId).orElseThrow(() -> new RuntimeException("Player Not Found: " + playerPublicId));
+        Room room = roomRepository.findByPublicId(player.getRoomPublicId()).orElseThrow(() -> new RuntimeException("Room Not Found: " + player.getRoomPublicId()));
+
         boolean deletedPlayerIsAdmin = player.isAdmin();
         if(deletedPlayerIsAdmin){
             throw new RuntimeException("Admin cannot be kicked!");
@@ -200,7 +206,7 @@ public class PlayerService {
         playerRepository.delete(player);
         List<PlayerDTO> playersLeft = playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId());
 
-        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, null, playersLeft));
+        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), playersLeft));
 
         return true;
     }

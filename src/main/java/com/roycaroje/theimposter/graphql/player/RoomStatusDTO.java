@@ -12,6 +12,8 @@ public class RoomStatusDTO {
     private UUID roomPublicId;
     private GameStatus status;
     private String startingPlayer;
+    private String language;
+    private int numImposters;
     private List<PlayerDTO> players;
 }
 

@@ -10,6 +10,7 @@ import com.roycaroje.theimposter.repository.RoomRepository;
 import com.roycaroje.theimposter.transformer.RoomTransformer;
 import com.roycaroje.theimposter.util.CodeGenerator;
 import lombok.AllArgsConstructor;
+import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,6 +90,7 @@ public class RoomService {
         dto.setCode(room.getCode());
         dto.setNumImpostors(room.getNumImpostors());
         dto.setAdminPublicId(room.getAdminPublicId());
+        dto.setLanguage(room.getLanguage());
         List<PlayerDTO> players = playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId());
         dto.setPlayers(players);
         return new ResultWithCountFor<>(List.of(dto));
@@ -126,7 +128,7 @@ public class RoomService {
         room = roomRepository.save(room);
         playerRepository.saveAll(players);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, null, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, null, room.getLanguage(), room.getNumImpostors(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
@@ -180,7 +182,7 @@ public class RoomService {
         Collections.shuffle(randomList);
         String startingPlayer = randomList.getFirst().getName();
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.PLAYING, startingPlayer, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.PLAYING, startingPlayer, room.getLanguage(), room.getNumImpostors(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
@@ -199,7 +201,21 @@ public class RoomService {
         room.setStartedAt(null);
         room = roomRepository.save(room);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        return true;
+    }
+
+    public boolean editRoom(UUID roomPublicId, int numImposters, String language){
+        if(!(language.equals("es") || language.equals("en"))){
+            throw new IllegalArgumentException("Incorrect language: " + language);
+        }
+        Room room = roomRepository.findByPublicId(roomPublicId).orElseThrow(() -> new RuntimeException("Room not found: " + roomPublicId));
+
+        room.setNumImpostors(numImposters);
+        room.setLanguage(language);
+        room = roomRepository.save(room);
+
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
