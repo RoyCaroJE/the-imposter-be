@@ -61,7 +61,7 @@ public class RoomService {
         return code;
     }
 
-    private String setRoomWord(String language) {
+    private static String setRoomWord(String language) {
         try {
             String url = "https://random-word-api.herokuapp.com/word?lang=" + language;
             HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
@@ -98,23 +98,17 @@ public class RoomService {
     public boolean startGame(UUID roomPublicId){
         Room room = roomRepository.findByPublicId(roomPublicId).orElseThrow(() -> new RuntimeException("Room not found: " + roomPublicId));
         List<Player> players = playerRepository.findByRoomPublicId(roomPublicId);
-        boolean allPlayersAreReady = players.stream().allMatch(Player::isConfirmed);
-        if(!allPlayersAreReady) {
-            throw new IllegalArgumentException("Not all players are ready!");
-        }
-        int numberOfImposters = room.getNumImpostors();
-        if(numberOfImposters + 2 < players.size()){
-            throw new IllegalArgumentException("This room needs more players to play the game!");
-        }
+
+        checkIfGameCanStart(players, room);
+
         room.setStatus(GameStatus.STARTED.toString());
         room.setStartedAt(Instant.now());
-        room = roomRepository.save(room);
 
         String wordForThisRound = setRoomWord(room.getLanguage());
-        List<Player> imposters = pickRandomPlayers(players, numberOfImposters);
+        List<UUID> imposterPublicIds = pickRandomPlayers(players, room.getNumImpostors());
 
         for(Player player : players){
-            if (imposters.contains(player)) {
+            if (imposterPublicIds.contains(player.getPublicId())) {
                 player.setImpostor(true);
                 player.setConfirmed(false);
                 if(room.getLanguage().equals("es")){
@@ -129,19 +123,36 @@ public class RoomService {
             }
         }
 
+        room = roomRepository.save(room);
         playerRepository.saveAll(players);
 
         publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, null, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
-    private static List<Player> pickRandomPlayers(List<Player> players, int n) {
+    private void checkIfGameCanStart(List<Player> players, Room room){
+        if(players.isEmpty()){
+            throw new RuntimeException("No players in the room: " + room.getPublicId());
+        }
+
+        boolean allPlayersAreReady = players.stream().allMatch(Player::isConfirmed);
+        if(!allPlayersAreReady) {
+            throw new IllegalArgumentException("Not all players are ready!");
+        }
+
+        int numberOfImposters = room.getNumImpostors();
+        if(numberOfImposters + 2 < players.size()){
+            throw new IllegalArgumentException("This room needs more players to play the game!");
+        }
+    }
+
+    private static List<UUID> pickRandomPlayers(List<Player> players, int n) {
         if (n > players.size()) {
             throw new IllegalArgumentException("n cannot be larger than the list size");
         }
 
-        List<Player> copy = List.copyOf(players);
-        List<Player> mutableCopy = new ArrayList<>(copy);
+        List<UUID> copyOfPublicIds = List.copyOf(players.stream().map(Player::getPublicId).toList());
+        List<UUID> mutableCopy = new ArrayList<>(copyOfPublicIds);
 
         Collections.shuffle(mutableCopy);
         return mutableCopy.subList(0, n);
