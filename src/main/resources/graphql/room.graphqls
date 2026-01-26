@@ -8,6 +8,7 @@ type RoomDTO {
     code: String!
     adminPublicId: ID!
     numImpostors: Int!
+    language: String!
     joinedPlayerPublicId: ID!
     players: [PlayerDTO!]!
 }
@@ -15,6 +16,8 @@ type RoomDTO {
 type RoomStatusDTO {
     status: GameStatus!
     startingPlayer: String
+    language: String!
+    numImposters: Int!
     players: [PlayerDTO!]!
 }
 

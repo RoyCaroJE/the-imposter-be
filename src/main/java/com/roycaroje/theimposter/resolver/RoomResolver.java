@@ -39,6 +39,11 @@ public class RoomResolver {
         return roomService.finishDiscussion(roomPublicId);
     }
 
+    @MutationMapping
+    public boolean editRoom(@Argument UUID roomPublicId, @Argument int numImposters, @Argument String language){
+        return roomService.editRoom(roomPublicId, numImposters, language);
+    }
+
     // QUERIES
 
     @QueryMapping
