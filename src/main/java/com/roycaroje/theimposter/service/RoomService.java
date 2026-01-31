@@ -143,7 +143,7 @@ public class RoomService {
         }
 
         int numberOfImposters = room.getNumImpostors();
-        if(numberOfImposters + 2 < players.size()){
+        if(players.size() < numberOfImposters + 2){
             throw new IllegalArgumentException("This room needs more players to play the game!");
         }
     }
