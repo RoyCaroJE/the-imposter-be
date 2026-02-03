@@ -185,6 +185,7 @@ public class PlayerService {
             if(deletedPlayerWasAdmin) {
                 Player randomPlayer = playerRepository.findByPublicId(playersLeft.getFirst().getPublicId()).orElseThrow(() -> new RuntimeException("Player not found"));
                 randomPlayer.setAdmin(true);
+                playersLeft.getFirst().setAdmin(true);
                 playerRepository.save(randomPlayer);
             }
         }
