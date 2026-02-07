@@ -130,10 +130,10 @@ public class PlayerService {
     @Transactional
     public ResultWithCountFor<RoomDTO> joinRoom(String playerName, String roomCode) {
         if(playerName.isBlank() || roomCode.isBlank()){
-            throw new IllegalArgumentException("Player name and Room Code cannot be empty");
+            throw new IllegalArgumentException("player_and_room_cannot_be_empty");
         }
 
-        Room room = roomRepository.findByCode(roomCode).orElseThrow(() -> new RuntimeException("Room not found"));
+        Room room = roomRepository.findByCode(roomCode).orElseThrow(() -> new RuntimeException("room_not_found"));
         List<PlayerDTO> playersBefore = playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId());
         boolean playerNameAlreadyExists = playersBefore.stream().anyMatch(p -> p.getName().equalsIgnoreCase(playerName));
         if(playerNameAlreadyExists) {
@@ -141,7 +141,7 @@ public class PlayerService {
         }
 
         if (!GameStatus.WAITING.toString().equals(room.getStatus())) {
-            throw new RuntimeException("Game already started");
+            throw new RuntimeException("game_already_started");
         }
 
         Player player = playerTransformer.createBasicPlayer(playerName, room.getPublicId());

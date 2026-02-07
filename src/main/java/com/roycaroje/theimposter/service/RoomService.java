@@ -34,7 +34,7 @@ public class RoomService {
 
     public ResultWithCountFor<RoomDTO> createRoom(int numImpostors, String playerName, String language) {
         if(playerName.isBlank()){
-            throw new IllegalArgumentException("Player name cannot be empty");
+            throw new IllegalArgumentException("player_name_cannot_be_empty");
         }
         if(!(language.equals("es") || language.equals("en"))){
             throw new IllegalArgumentException("Incorrect language: " + language);
