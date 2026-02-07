@@ -134,6 +134,11 @@ public class PlayerService {
         }
 
         Room room = roomRepository.findByCode(roomCode).orElseThrow(() -> new RuntimeException("Room not found"));
+        List<PlayerDTO> playersBefore = playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId());
+        boolean playerNameAlreadyExists = playersBefore.stream().anyMatch(p -> p.getName().equalsIgnoreCase(playerName));
+        if(playerNameAlreadyExists) {
+            throw new IllegalArgumentException("player_name_already_exists");
+        }
 
         if (!GameStatus.WAITING.toString().equals(room.getStatus())) {
             throw new RuntimeException("Game already started");
@@ -142,7 +147,6 @@ public class PlayerService {
         Player player = playerTransformer.createBasicPlayer(playerName, room.getPublicId());
 
         player = playerRepository.save(player);
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
 
         RoomDTO roomDTO = new RoomDTO();
         roomDTO.setPublicId(room.getPublicId());
@@ -152,6 +156,7 @@ public class PlayerService {
         roomDTO.setJoinedPlayerPublicId(player.getPublicId());
         List<PlayerDTO> players = playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId());
         roomDTO.setPlayers(players);
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
 
         return new ResultWithCountFor<>(List.of(roomDTO));
     }
