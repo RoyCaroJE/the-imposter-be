@@ -24,9 +24,21 @@ spring:
 
 server:
   forward-headers-strategy: framework
+  port: 8080
+  servlet:
+    context-path: /
 
 logging:
   level:
     root: INFO
     com.roycaroje.theimposter: DEBUG
     org.flywaydb: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
