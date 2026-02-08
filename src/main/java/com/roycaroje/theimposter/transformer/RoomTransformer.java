@@ -28,6 +28,7 @@ public class RoomTransformer {
         dto.setAdminPublicId(model.getAdminPublicId());
         dto.setPublicId(model.getPublicId());
         dto.setNumImpostors(model.getNumImpostors());
+        dto.setGameStatus(GameStatus.WAITING);
         PlayerDTO playerDTO = new PlayerDTO();
         playerDTO.setPublicId(model.getAdminPublicId());
         playerDTO.setName(playerName);
