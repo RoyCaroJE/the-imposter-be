@@ -10,6 +10,7 @@ type RoomDTO {
     numImpostors: Int!
     language: String!
     joinedPlayerPublicId: ID!
+    gameStatus: GameStatus!
     players: [PlayerDTO!]!
 }
 

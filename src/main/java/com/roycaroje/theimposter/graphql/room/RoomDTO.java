@@ -1,5 +1,6 @@
 package com.roycaroje.theimposter.graphql.room;
 
+import com.roycaroje.theimposter.graphql.player.GameStatus;
 import com.roycaroje.theimposter.graphql.player.PlayerDTO;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,7 @@ public class RoomDTO {
     private int numImpostors;
     private String language;
     private UUID joinedPlayerPublicId;
+    private GameStatus gameStatus;
     private List<PlayerDTO> players;
 }
 

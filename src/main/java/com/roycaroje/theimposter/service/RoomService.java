@@ -91,6 +91,7 @@ public class RoomService {
         dto.setNumImpostors(room.getNumImpostors());
         dto.setAdminPublicId(room.getAdminPublicId());
         dto.setLanguage(room.getLanguage());
+        dto.setGameStatus(GameStatus.valueOf(room.getStatus()));
         List<PlayerDTO> players = playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId());
         dto.setPlayers(players);
         return new ResultWithCountFor<>(List.of(dto));

@@ -154,6 +154,7 @@ public class PlayerService {
         roomDTO.setNumImpostors(room.getNumImpostors());
         roomDTO.setAdminPublicId(room.getAdminPublicId());
         roomDTO.setJoinedPlayerPublicId(player.getPublicId());
+        roomDTO.setGameStatus(GameStatus.valueOf(room.getStatus()));
         List<PlayerDTO> players = playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId());
         roomDTO.setPlayers(players);
         publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
