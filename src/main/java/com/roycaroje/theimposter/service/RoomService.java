@@ -129,7 +129,7 @@ public class RoomService {
         room = roomRepository.save(room);
         playerRepository.saveAll(players);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, null, room.getLanguage(), room.getNumImpostors(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, null, room.getLanguage(), room.getNumImpostors(), null, null, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
@@ -183,7 +183,7 @@ public class RoomService {
         Collections.shuffle(randomList);
         String startingPlayer = randomList.getFirst().getName();
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.PLAYING, startingPlayer, room.getLanguage(), room.getNumImpostors(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.PLAYING, startingPlayer, room.getLanguage(), room.getNumImpostors(), null, null, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
@@ -191,6 +191,10 @@ public class RoomService {
     public boolean finishDiscussion(UUID roomPublicId) {
         Room room = roomRepository.findByPublicId(roomPublicId).orElseThrow(() -> new RuntimeException("Room not found: " + roomPublicId));
         List<Player> players = playerRepository.findByRoomPublicId(roomPublicId);
+        String roomWord = players.getFirst().getWord();
+        List<String> imposters = players.stream()
+                .filter(Player::isImpostor)
+                .map(Player::getName).toList();
 
         for(Player player : players){
             player.setImpostor(false);
@@ -202,7 +206,7 @@ public class RoomService {
         room.setStartedAt(null);
         room = roomRepository.save(room);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), imposters, roomWord, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
@@ -216,7 +220,7 @@ public class RoomService {
         room.setLanguage(language);
         room = roomRepository.save(room);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), null, null, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
