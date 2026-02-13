@@ -19,6 +19,8 @@ type RoomStatusDTO {
     startingPlayer: String
     language: String!
     numImposters: Int!
+    lastImposters: [String!]
+    lastWord: String
     players: [PlayerDTO!]!
 }
 

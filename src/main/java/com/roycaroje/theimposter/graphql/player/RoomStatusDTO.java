@@ -14,6 +14,8 @@ public class RoomStatusDTO {
     private String startingPlayer;
     private String language;
     private int numImposters;
+    private List<String> lastImposters;
+    private String lastWord;
     private List<PlayerDTO> players;
 }
 
