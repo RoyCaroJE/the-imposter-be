@@ -5,6 +5,8 @@ import com.roycaroje.theimposter.graphql.player.GameStatus;
 import com.roycaroje.theimposter.graphql.player.PlayerDTO;
 import com.roycaroje.theimposter.graphql.player.PlayerWordDTO;
 import com.roycaroje.theimposter.graphql.room.RoomDTO;
+import com.roycaroje.theimposter.model.Difficulty;
+import com.roycaroje.theimposter.model.Language;
 import com.roycaroje.theimposter.model.Player;
 import com.roycaroje.theimposter.graphql.player.RoomStatusDTO;
 import com.roycaroje.theimposter.model.Room;
@@ -49,7 +51,7 @@ public class PlayerService {
                 player.setConnected(false);
                 playerRepository.save(player);
                 if(GameStatus.WAITING.toString().equals(room.getStatus())){
-                    publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.valueOf(room.getStatus()), null, room.getLanguage(), room.getNumImpostors(), null, null, playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
+                    publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.valueOf(room.getStatus()), null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), null, null, Difficulty.valueOf(room.getDifficulty()), playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
                 }
             }
         }
@@ -157,7 +159,7 @@ public class PlayerService {
         roomDTO.setGameStatus(GameStatus.valueOf(room.getStatus()));
         List<PlayerDTO> players = playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId());
         roomDTO.setPlayers(players);
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), null, null, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), null, null, Difficulty.valueOf(room.getDifficulty()), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
 
         return new ResultWithCountFor<>(List.of(roomDTO));
     }
@@ -171,7 +173,7 @@ public class PlayerService {
         player.setConnected(true);
         playerRepository.save(player);
 
-        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.valueOf(room.getStatus()), null, room.getLanguage(), room.getNumImpostors(), null, null, playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
+        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.valueOf(room.getStatus()), null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), null, null, Difficulty.valueOf(room.getDifficulty()), playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId())));
 
         return true;
     }
@@ -196,7 +198,7 @@ public class PlayerService {
             }
         }
 
-        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), null, null, playersLeft));
+        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), null, null, Difficulty.valueOf(room.getDifficulty()), playersLeft));
 
         return true;
     }
@@ -213,7 +215,7 @@ public class PlayerService {
         playerRepository.delete(player);
         List<PlayerDTO> playersLeft = playerRepository.findPlayersDTOByRoomPublicId(player.getRoomPublicId());
 
-        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), null, null, playersLeft));
+        publisher.publish(new RoomStatusDTO(player.getRoomPublicId(), GameStatus.WAITING, null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), null, null, Difficulty.valueOf(room.getDifficulty()), playersLeft));
 
         return true;
     }

@@ -2,6 +2,8 @@ package com.roycaroje.theimposter.resolver;
 
 import com.roycaroje.theimposter.graphql.ResultWithCountFor;
 import com.roycaroje.theimposter.graphql.room.RoomDTO;
+import com.roycaroje.theimposter.model.Difficulty;
+import com.roycaroje.theimposter.model.Language;
 import com.roycaroje.theimposter.service.RoomService;
 import lombok.AllArgsConstructor;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -20,8 +22,8 @@ public class RoomResolver {
     // MUTATIONS
 
     @MutationMapping
-    public ResultWithCountFor<RoomDTO> createRoom(@Argument int numImpostors, @Argument String playerName, @Argument String language) {
-        return roomService.createRoom(numImpostors, playerName, language);
+    public ResultWithCountFor<RoomDTO> createRoom(@Argument int numImpostors, @Argument String playerName, @Argument Language language, @Argument Difficulty difficulty) {
+        return roomService.createRoom(numImpostors, playerName, language, difficulty);
     }
 
     @MutationMapping
@@ -40,8 +42,8 @@ public class RoomResolver {
     }
 
     @MutationMapping
-    public boolean editRoom(@Argument UUID roomPublicId, @Argument int numImposters, @Argument String language){
-        return roomService.editRoom(roomPublicId, numImposters, language);
+    public boolean editRoom(@Argument UUID roomPublicId, @Argument int numImposters, @Argument Language language, @Argument Difficulty difficulty){
+        return roomService.editRoom(roomPublicId, numImposters, language, difficulty);
     }
 
     // QUERIES
