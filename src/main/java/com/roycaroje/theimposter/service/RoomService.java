@@ -172,7 +172,11 @@ public class RoomService {
     public boolean finishDiscussion(UUID roomPublicId) {
         Room room = roomRepository.findByPublicId(roomPublicId).orElseThrow(() -> new RuntimeException("Room not found: " + roomPublicId));
         List<Player> players = playerRepository.findByRoomPublicId(roomPublicId);
-        String roomWord = players.getFirst().getWord();
+        Optional<Player> firstNonImposter = players.stream().filter(p -> !p.isImpostor()).findFirst();
+        if(firstNonImposter.isEmpty()) {
+            throw new RuntimeException("Unexpected error: No non-imposter player exists");
+        }
+        String roomWord = firstNonImposter.get().getWord();
         List<String> imposters = players.stream()
                 .filter(Player::isImpostor)
                 .map(Player::getName).toList();
