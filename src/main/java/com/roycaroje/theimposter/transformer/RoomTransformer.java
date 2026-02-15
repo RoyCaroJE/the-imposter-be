@@ -3,6 +3,8 @@ package com.roycaroje.theimposter.transformer;
 import com.roycaroje.theimposter.graphql.player.GameStatus;
 import com.roycaroje.theimposter.graphql.player.PlayerDTO;
 import com.roycaroje.theimposter.graphql.room.RoomDTO;
+import com.roycaroje.theimposter.model.Difficulty;
+import com.roycaroje.theimposter.model.Language;
 import com.roycaroje.theimposter.model.Room;
 import org.springframework.stereotype.Component;
 
@@ -13,13 +15,14 @@ import java.util.UUID;
 @Component
 public class RoomTransformer {
 
-    public Room createBaseForNewRoom(int numImpostors, String language){
+    public Room createBaseForNewRoom(int numImpostors, Language language, Difficulty difficulty){
         Room room = new Room();
         room.setPublicId(UUID.randomUUID());
         room.setStatus(GameStatus.WAITING.toString());
         room.setNumImpostors(numImpostors);
         room.setCreated(Instant.now());
-        room.setLanguage(language);
+        room.setLanguage(language.name());
+        room.setDifficulty(difficulty.name());
         return room;
     }
 

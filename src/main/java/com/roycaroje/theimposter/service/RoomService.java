@@ -10,14 +10,9 @@ import com.roycaroje.theimposter.repository.RoomRepository;
 import com.roycaroje.theimposter.transformer.RoomTransformer;
 import com.roycaroje.theimposter.util.CodeGenerator;
 import lombok.AllArgsConstructor;
-import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.util.*;
 
@@ -30,17 +25,14 @@ public class RoomService {
     private final PlayerService playerService;
     private final PlayerRepository playerRepository;
     private final GameEventPublisher publisher;
-    private static final HttpClient client = HttpClient.newHttpClient();
+    private final WordService wordService;
 
-    public ResultWithCountFor<RoomDTO> createRoom(int numImpostors, String playerName, String language) {
+    public ResultWithCountFor<RoomDTO> createRoom(int numImpostors, String playerName, Language language, Difficulty difficulty) {
         if(playerName.isBlank()){
             throw new IllegalArgumentException("player_name_cannot_be_empty");
         }
-        if(!(language.equals("es") || language.equals("en"))){
-            throw new IllegalArgumentException("Incorrect language: " + language);
-        }
 
-        Room room = roomTransformer.createBaseForNewRoom(numImpostors, language);
+        Room room = roomTransformer.createBaseForNewRoom(numImpostors, language, difficulty);
         room.setCode(setRoomCode());
         room.setStatus(GameStatus.WAITING.toString());
         UUID adminPublicId = playerService.createAdminPlayer(playerName, room.getPublicId());
@@ -62,19 +54,6 @@ public class RoomService {
         return code;
     }
 
-    private static String setRoomWord(String language) {
-        try {
-            String url = "https://random-word-api.herokuapp.com/word?lang=" + language;
-            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            String body = response.body();
-            return body.replace("[\"", "").replace("\"]", "");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public ResultWithCountFor<RoomDTO> getRoomByCode(String roomCode){
         if(roomCode.isBlank()){
             throw new IllegalArgumentException("Room code cannot be empty");
@@ -92,6 +71,7 @@ public class RoomService {
         dto.setAdminPublicId(room.getAdminPublicId());
         dto.setLanguage(room.getLanguage());
         dto.setGameStatus(GameStatus.valueOf(room.getStatus()));
+
         List<PlayerDTO> players = playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId());
         dto.setPlayers(players);
         return new ResultWithCountFor<>(List.of(dto));
@@ -107,7 +87,7 @@ public class RoomService {
         room.setStatus(GameStatus.STARTED.toString());
         room.setStartedAt(Instant.now());
 
-        String wordForThisRound = setRoomWord(room.getLanguage());
+        String wordForThisRound = wordService.getRandomWord(Language.valueOf(room.getLanguage()), Difficulty.valueOf(room.getDifficulty()));
         List<UUID> imposterPublicIds = pickRandomPlayers(players, room.getNumImpostors());
 
         for(Player player : players){
@@ -129,7 +109,7 @@ public class RoomService {
         room = roomRepository.save(room);
         playerRepository.saveAll(players);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, null, room.getLanguage(), room.getNumImpostors(), null, null, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, null, room.getLanguage(), room.getNumImpostors(), null, null, room.getDifficulty(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
@@ -183,7 +163,7 @@ public class RoomService {
         Collections.shuffle(randomList);
         String startingPlayer = randomList.getFirst().getName();
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.PLAYING, startingPlayer, room.getLanguage(), room.getNumImpostors(), null, null, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.PLAYING, startingPlayer, room.getLanguage(), room.getNumImpostors(), null, null, room.getDifficulty(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
@@ -206,21 +186,19 @@ public class RoomService {
         room.setStartedAt(null);
         room = roomRepository.save(room);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), imposters, roomWord, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), imposters, roomWord, room.getDifficulty(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
-    public boolean editRoom(UUID roomPublicId, int numImposters, String language){
-        if(!(language.equals("es") || language.equals("en"))){
-            throw new IllegalArgumentException("Incorrect language: " + language);
-        }
+    public boolean editRoom(UUID roomPublicId, int numImposters, Language language, Difficulty difficulty){
         Room room = roomRepository.findByPublicId(roomPublicId).orElseThrow(() -> new RuntimeException("Room not found: " + roomPublicId));
 
         room.setNumImpostors(numImposters);
-        room.setLanguage(language);
+        room.setLanguage(language.name());
+        room.setDifficulty(difficulty.name());
         room = roomRepository.save(room);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), null, null, playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), null, null, room.getDifficulty(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 

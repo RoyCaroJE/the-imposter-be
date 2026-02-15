@@ -1,0 +1,12 @@
+{
+  "ES": {
+    "EASY": ["perro", "gato", "mesa"],
+    "MEDIUM": ["montaña", "bosque", "hospital"],
+    "HARD": ["metamorfosis", "paradigma", "epistemologia"]
+  },
+  "EN": {
+    "EASY": ["dog", "cat", "table"],
+    "MEDIUM": ["mountain", "forest", "hospital"],
+    "HARD": ["metamorphosis", "paradigm", "epistemology"]
+  }
+}

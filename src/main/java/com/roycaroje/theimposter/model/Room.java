@@ -26,4 +26,5 @@ public class Room extends BaseEntity {
     private Integer numImpostors;
     private Instant startedAt;
     private String language;
+    private String difficulty;
 }

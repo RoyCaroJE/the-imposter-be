@@ -18,6 +18,7 @@ public class RoomDTO {
     private String language;
     private UUID joinedPlayerPublicId;
     private GameStatus gameStatus;
+    private String difficulty;
     private List<PlayerDTO> players;
 }
 

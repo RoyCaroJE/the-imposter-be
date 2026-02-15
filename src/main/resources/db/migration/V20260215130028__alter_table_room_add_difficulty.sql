@@ -1,0 +1,2 @@
+ALTER TABLE room
+    ADD COLUMN difficulty VARCHAR(20) NOT NULL;

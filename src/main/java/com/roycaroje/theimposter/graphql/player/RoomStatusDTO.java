@@ -16,6 +16,7 @@ public class RoomStatusDTO {
     private int numImposters;
     private List<String> lastImposters;
     private String lastWord;
+    private String difficulty;
     private List<PlayerDTO> players;
 }
 

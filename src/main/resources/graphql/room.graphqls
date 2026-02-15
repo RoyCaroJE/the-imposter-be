@@ -11,6 +11,7 @@ type RoomDTO {
     language: String!
     joinedPlayerPublicId: ID!
     gameStatus: GameStatus!
+    difficulty: String!
     players: [PlayerDTO!]!
 }
 
@@ -21,6 +22,7 @@ type RoomStatusDTO {
     numImposters: Int!
     lastImposters: [String!]
     lastWord: String
+    difficulty: String!
     players: [PlayerDTO!]!
 }
 
@@ -28,4 +30,16 @@ enum GameStatus {
     WAITING
     STARTED
     PLAYING
+}
+
+enum Language {
+    ES
+    EN
+}
+
+enum Difficulty {
+    EASY
+    MEDIUM
+    HARD
+    MIXED
 }
