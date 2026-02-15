@@ -69,8 +69,9 @@ public class RoomService {
         dto.setCode(room.getCode());
         dto.setNumImpostors(room.getNumImpostors());
         dto.setAdminPublicId(room.getAdminPublicId());
-        dto.setLanguage(room.getLanguage());
+        dto.setLanguage(Language.valueOf(room.getLanguage()));
         dto.setGameStatus(GameStatus.valueOf(room.getStatus()));
+        dto.setDifficulty(Difficulty.valueOf(room.getDifficulty()));
 
         List<PlayerDTO> players = playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId());
         dto.setPlayers(players);
@@ -109,7 +110,7 @@ public class RoomService {
         room = roomRepository.save(room);
         playerRepository.saveAll(players);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, null, room.getLanguage(), room.getNumImpostors(), null, null, room.getDifficulty(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), null, null, Difficulty.valueOf(room.getDifficulty()), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
@@ -163,7 +164,7 @@ public class RoomService {
         Collections.shuffle(randomList);
         String startingPlayer = randomList.getFirst().getName();
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.PLAYING, startingPlayer, room.getLanguage(), room.getNumImpostors(), null, null, room.getDifficulty(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.PLAYING, startingPlayer, Language.valueOf(room.getLanguage()), room.getNumImpostors(), null, null, Difficulty.valueOf(room.getDifficulty()), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
@@ -186,7 +187,7 @@ public class RoomService {
         room.setStartedAt(null);
         room = roomRepository.save(room);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), imposters, roomWord, room.getDifficulty(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), imposters, roomWord, Difficulty.valueOf(room.getDifficulty()), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
@@ -198,7 +199,7 @@ public class RoomService {
         room.setDifficulty(difficulty.name());
         room = roomRepository.save(room);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, room.getLanguage(), room.getNumImpostors(), null, null, room.getDifficulty(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), null, null, Difficulty.valueOf(room.getDifficulty()), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 

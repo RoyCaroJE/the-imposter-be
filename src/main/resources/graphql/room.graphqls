@@ -8,21 +8,21 @@ type RoomDTO {
     code: String!
     adminPublicId: ID!
     numImpostors: Int!
-    language: String!
+    language: Language!
     joinedPlayerPublicId: ID!
     gameStatus: GameStatus!
-    difficulty: String!
+    difficulty: Difficulty!
     players: [PlayerDTO!]!
 }
 
 type RoomStatusDTO {
     status: GameStatus!
     startingPlayer: String
-    language: String!
+    language: Language!
     numImposters: Int!
     lastImposters: [String!]
     lastWord: String
-    difficulty: String!
+    difficulty: Difficulty!
     players: [PlayerDTO!]!
 }
 

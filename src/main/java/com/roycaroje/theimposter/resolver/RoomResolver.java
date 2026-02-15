@@ -42,7 +42,7 @@ public class RoomResolver {
     }
 
     @MutationMapping
-    public boolean editRoom(@Argument UUID roomPublicId, @Argument int numImposters, @Argument Language language, Difficulty difficulty){
+    public boolean editRoom(@Argument UUID roomPublicId, @Argument int numImposters, @Argument Language language, @Argument Difficulty difficulty){
         return roomService.editRoom(roomPublicId, numImposters, language, difficulty);
     }
 

@@ -2,6 +2,8 @@ package com.roycaroje.theimposter.graphql.room;
 
 import com.roycaroje.theimposter.graphql.player.GameStatus;
 import com.roycaroje.theimposter.graphql.player.PlayerDTO;
+import com.roycaroje.theimposter.model.Difficulty;
+import com.roycaroje.theimposter.model.Language;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,10 +17,10 @@ public class RoomDTO {
     private String code;
     private UUID adminPublicId;
     private int numImpostors;
-    private String language;
+    private Language language;
     private UUID joinedPlayerPublicId;
     private GameStatus gameStatus;
-    private String difficulty;
+    private Difficulty difficulty;
     private List<PlayerDTO> players;
 }
 
