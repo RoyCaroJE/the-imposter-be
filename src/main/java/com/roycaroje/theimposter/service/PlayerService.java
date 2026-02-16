@@ -113,6 +113,7 @@ public class PlayerService {
         roomRepository.deleteAll(roomsToDelete);
     }
 
+    @Transactional
     public boolean playerHeartbeat(UUID playerPublicId) {
         Player player = playerRepository.findByPublicId(playerPublicId).orElseThrow(() -> new RuntimeException("Player not found"));
 
@@ -123,6 +124,7 @@ public class PlayerService {
         return true;
     }
 
+    @Transactional
     public UUID createAdminPlayer(String playerName, UUID roomPublicId){
         Player player = playerTransformer.createAdminPlayer(playerName, roomPublicId);
         player = playerRepository.save(player);

@@ -27,6 +27,7 @@ public class RoomService {
     private final GameEventPublisher publisher;
     private final WordService wordService;
 
+    @Transactional
     public ResultWithCountFor<RoomDTO> createRoom(int numImpostors, String playerName, Language language, Difficulty difficulty) {
         if(playerName.isBlank()){
             throw new IllegalArgumentException("player_name_cannot_be_empty");
