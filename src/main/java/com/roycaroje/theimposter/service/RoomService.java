@@ -96,7 +96,7 @@ public class RoomService {
             if (imposterPublicIds.contains(player.getPublicId())) {
                 player.setImpostor(true);
                 player.setConfirmed(false);
-                if(room.getLanguage().equals("es")){
+                if(Language.ES.name().equals(room.getLanguage())){
                     player.setWord("IMPOSTOR");
                 } else {
                     player.setWord("IMPOSTER");
