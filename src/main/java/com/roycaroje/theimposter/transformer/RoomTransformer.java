@@ -15,7 +15,7 @@ import java.util.UUID;
 @Component
 public class RoomTransformer {
 
-    public Room createBaseForNewRoom(int numImpostors, Language language, Difficulty difficulty){
+    public Room createBaseForNewRoom(int numImpostors, Language language, Difficulty difficulty, boolean privateRoom){
         Room room = new Room();
         room.setPublicId(UUID.randomUUID());
         room.setStatus(GameStatus.WAITING.toString());
@@ -23,6 +23,7 @@ public class RoomTransformer {
         room.setCreated(Instant.now());
         room.setLanguage(language.name());
         room.setDifficulty(difficulty.name());
+        room.setPrivateRoom(privateRoom);
         return room;
     }
 
@@ -32,6 +33,7 @@ public class RoomTransformer {
         dto.setPublicId(model.getPublicId());
         dto.setNumImpostors(model.getNumImpostors());
         dto.setGameStatus(GameStatus.WAITING);
+        dto.setPrivateRoom(model.isPrivateRoom());
         PlayerDTO playerDTO = new PlayerDTO();
         playerDTO.setPublicId(model.getAdminPublicId());
         playerDTO.setName(playerName);

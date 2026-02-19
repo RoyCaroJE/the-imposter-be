@@ -27,4 +27,5 @@ public class Room extends BaseEntity {
     private Instant startedAt;
     private String language;
     private String difficulty;
+    private boolean privateRoom;
 }

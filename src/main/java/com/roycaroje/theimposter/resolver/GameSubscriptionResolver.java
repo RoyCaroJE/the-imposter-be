@@ -1,7 +1,6 @@
 package com.roycaroje.theimposter.resolver;
 
-import com.roycaroje.theimposter.graphql.player.*;
-import com.roycaroje.theimposter.model.*;
+import com.roycaroje.theimposter.graphql.room.RoomStatusDTO;
 import com.roycaroje.theimposter.publisher.GameEventPublisher;
 import lombok.AllArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;

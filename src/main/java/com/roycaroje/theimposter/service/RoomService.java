@@ -2,7 +2,9 @@ package com.roycaroje.theimposter.service;
 
 import com.roycaroje.theimposter.graphql.*;
 import com.roycaroje.theimposter.graphql.player.*;
+import com.roycaroje.theimposter.graphql.room.PublicRoomsDTO;
 import com.roycaroje.theimposter.graphql.room.RoomDTO;
+import com.roycaroje.theimposter.graphql.room.RoomStatusDTO;
 import com.roycaroje.theimposter.model.*;
 import com.roycaroje.theimposter.publisher.GameEventPublisher;
 import com.roycaroje.theimposter.repository.PlayerRepository;
@@ -28,12 +30,12 @@ public class RoomService {
     private final WordService wordService;
 
     @Transactional
-    public ResultWithCountFor<RoomDTO> createRoom(int numImpostors, String playerName, Language language, Difficulty difficulty) {
+    public ResultWithCountFor<RoomDTO> createRoom(int numImpostors, String playerName, Language language, Difficulty difficulty, boolean privateRoom) {
         if(playerName.isBlank()){
             throw new IllegalArgumentException("player_name_cannot_be_empty");
         }
 
-        Room room = roomTransformer.createBaseForNewRoom(numImpostors, language, difficulty);
+        Room room = roomTransformer.createBaseForNewRoom(numImpostors, language, difficulty, privateRoom);
         room.setCode(setRoomCode());
         room.setStatus(GameStatus.WAITING.toString());
         UUID adminPublicId = playerService.createAdminPlayer(playerName, room.getPublicId());
@@ -73,6 +75,7 @@ public class RoomService {
         dto.setLanguage(Language.valueOf(room.getLanguage()));
         dto.setGameStatus(GameStatus.valueOf(room.getStatus()));
         dto.setDifficulty(Difficulty.valueOf(room.getDifficulty()));
+        dto.setPrivateRoom(room.isPrivateRoom());
 
         List<PlayerDTO> players = playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId());
         dto.setPlayers(players);
@@ -111,7 +114,7 @@ public class RoomService {
         room = roomRepository.save(room);
         playerRepository.saveAll(players);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), null, null, Difficulty.valueOf(room.getDifficulty()), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), null, null, Difficulty.valueOf(room.getDifficulty()), room.isPrivateRoom(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
@@ -165,7 +168,7 @@ public class RoomService {
         Collections.shuffle(randomList);
         String startingPlayer = randomList.getFirst().getName();
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.PLAYING, startingPlayer, Language.valueOf(room.getLanguage()), room.getNumImpostors(), null, null, Difficulty.valueOf(room.getDifficulty()), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.PLAYING, startingPlayer, Language.valueOf(room.getLanguage()), room.getNumImpostors(), null, null, Difficulty.valueOf(room.getDifficulty()), room.isPrivateRoom(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
@@ -192,20 +195,27 @@ public class RoomService {
         room.setStartedAt(null);
         room = roomRepository.save(room);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), imposters, roomWord, Difficulty.valueOf(room.getDifficulty()), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), imposters, roomWord, Difficulty.valueOf(room.getDifficulty()), room.isPrivateRoom(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
-    public boolean editRoom(UUID roomPublicId, int numImposters, Language language, Difficulty difficulty){
+    @Transactional
+    public boolean editRoom(UUID roomPublicId, int numImposters, Language language, Difficulty difficulty, boolean privateRoom){
         Room room = roomRepository.findByPublicId(roomPublicId).orElseThrow(() -> new RuntimeException("Room not found: " + roomPublicId));
 
         room.setNumImpostors(numImposters);
         room.setLanguage(language.name());
         room.setDifficulty(difficulty.name());
+        room.setPrivateRoom(privateRoom);
         room = roomRepository.save(room);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), null, null, Difficulty.valueOf(room.getDifficulty()), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), null, null, Difficulty.valueOf(room.getDifficulty()), room.isPrivateRoom(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
+    }
+
+    public ResultWithCountFor<PublicRoomsDTO> getAllPublicRooms(){
+        List<PublicRoomsDTO> publicRooms = roomRepository.findAllPublicRooms();
+        return new ResultWithCountFor<>(publicRooms);
     }
 
 }

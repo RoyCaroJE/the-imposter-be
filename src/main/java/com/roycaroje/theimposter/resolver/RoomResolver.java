@@ -1,6 +1,7 @@
 package com.roycaroje.theimposter.resolver;
 
 import com.roycaroje.theimposter.graphql.ResultWithCountFor;
+import com.roycaroje.theimposter.graphql.room.PublicRoomsDTO;
 import com.roycaroje.theimposter.graphql.room.RoomDTO;
 import com.roycaroje.theimposter.model.Difficulty;
 import com.roycaroje.theimposter.model.Language;
@@ -22,8 +23,14 @@ public class RoomResolver {
     // MUTATIONS
 
     @MutationMapping
-    public ResultWithCountFor<RoomDTO> createRoom(@Argument int numImpostors, @Argument String playerName, @Argument Language language, @Argument Difficulty difficulty) {
-        return roomService.createRoom(numImpostors, playerName, language, difficulty);
+    public ResultWithCountFor<RoomDTO> createRoom(
+            @Argument int numImpostors,
+            @Argument String playerName,
+            @Argument Language language,
+            @Argument Difficulty difficulty,
+            @Argument boolean privateRoom
+            ) {
+        return roomService.createRoom(numImpostors, playerName, language, difficulty, privateRoom);
     }
 
     @MutationMapping
@@ -42,8 +49,14 @@ public class RoomResolver {
     }
 
     @MutationMapping
-    public boolean editRoom(@Argument UUID roomPublicId, @Argument int numImposters, @Argument Language language, @Argument Difficulty difficulty){
-        return roomService.editRoom(roomPublicId, numImposters, language, difficulty);
+    public boolean editRoom(
+            @Argument UUID roomPublicId,
+            @Argument int numImposters,
+            @Argument Language language,
+            @Argument Difficulty difficulty,
+            @Argument boolean privateRoom
+            ){
+        return roomService.editRoom(roomPublicId, numImposters, language, difficulty, privateRoom);
     }
 
     // QUERIES
@@ -51,6 +64,11 @@ public class RoomResolver {
     @QueryMapping
     public ResultWithCountFor<RoomDTO> getRoomByCode(@Argument String roomCode){
         return roomService.getRoomByCode(roomCode);
+    }
+
+    @QueryMapping
+    public ResultWithCountFor<PublicRoomsDTO> getAllPublicRooms(){
+        return roomService.getAllPublicRooms();
     }
 }
 
