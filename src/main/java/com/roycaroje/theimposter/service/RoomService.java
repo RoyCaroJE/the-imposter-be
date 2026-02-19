@@ -87,6 +87,18 @@ public class RoomService {
         Room room = roomRepository.findByPublicId(roomPublicId).orElseThrow(() -> new RuntimeException("Room not found: " + roomPublicId));
         List<Player> players = playerRepository.findByRoomPublicId(roomPublicId);
 
+        // This means we're coming from another game
+        String lastWord = null;
+        List<String> lastImposters = null;
+        if(GameStatus.PLAYING.name().equals(room.getStatus())) {
+            Optional<Player> firstNonImposter = players.stream().filter(p -> !p.isImpostor()).findFirst();
+            if(firstNonImposter.isEmpty()) {
+                throw new RuntimeException("Unexpected error: No non-imposter player exists");
+            }
+            lastWord = firstNonImposter.get().getWord();
+            lastImposters = players.stream().filter(Player::isImpostor).map(Player::getName).toList();
+        }
+
         checkIfGameCanStart(players, room);
 
         room.setStatus(GameStatus.STARTED.toString());
@@ -114,7 +126,7 @@ public class RoomService {
         room = roomRepository.save(room);
         playerRepository.saveAll(players);
 
-        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), null, null, Difficulty.valueOf(room.getDifficulty()), room.isPrivateRoom(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+        publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.STARTED, null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), lastImposters, lastWord, Difficulty.valueOf(room.getDifficulty()), room.isPrivateRoom(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
 
@@ -123,9 +135,11 @@ public class RoomService {
             throw new RuntimeException("No players in the room: " + room.getPublicId());
         }
 
-        boolean allPlayersAreReady = players.stream().allMatch(Player::isConfirmed);
-        if(!allPlayersAreReady) {
-            throw new IllegalArgumentException("Not all players are ready!");
+        if(!GameStatus.PLAYING.name().equals(room.getStatus())) {
+            boolean allPlayersAreReady = players.stream().allMatch(Player::isConfirmed);
+            if(!allPlayersAreReady) {
+                throw new IllegalArgumentException("Not all players are ready!");
+            }
         }
 
         int numberOfImposters = room.getNumImpostors();
