@@ -21,6 +21,7 @@ public class RoomDTO {
     private UUID joinedPlayerPublicId;
     private GameStatus gameStatus;
     private Difficulty difficulty;
+    private boolean privateRoom;
     private List<PlayerDTO> players;
 }
 

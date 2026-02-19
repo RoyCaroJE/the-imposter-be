@@ -12,6 +12,7 @@ type RoomDTO {
     joinedPlayerPublicId: ID!
     gameStatus: GameStatus!
     difficulty: Difficulty!
+    privateRoom: Boolean!
     players: [PlayerDTO!]!
 }
 
@@ -23,6 +24,7 @@ type RoomStatusDTO {
     lastImposters: [String!]
     lastWord: String
     difficulty: Difficulty!
+    privateRoom: Boolean!
     players: [PlayerDTO!]!
 }
 
@@ -42,4 +44,18 @@ enum Difficulty {
     MEDIUM
     HARD
     MIXED
+}
+
+type ResultWithCountForPublicRoomsDTO {
+    queryCount: Int!
+    result: [PublicRoomsDTO!]!
+}
+
+type PublicRoomsDTO {
+    publicId: ID!
+    code: String!
+    adminName: String!
+    numImpostors: Int!
+    language: Language!
+    difficulty: Difficulty!
 }
