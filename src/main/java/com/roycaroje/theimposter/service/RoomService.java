@@ -7,6 +7,7 @@ import com.roycaroje.theimposter.graphql.room.RoomDTO;
 import com.roycaroje.theimposter.graphql.room.RoomStatusDTO;
 import com.roycaroje.theimposter.model.*;
 import com.roycaroje.theimposter.publisher.GameEventPublisher;
+import com.roycaroje.theimposter.repository.CustomWordRepository;
 import com.roycaroje.theimposter.repository.PlayerRepository;
 import com.roycaroje.theimposter.repository.RoomRepository;
 import com.roycaroje.theimposter.transformer.RoomTransformer;
@@ -28,6 +29,7 @@ public class RoomService {
     private final PlayerRepository playerRepository;
     private final GameEventPublisher publisher;
     private final WordService wordService;
+    private final CustomWordRepository customWordRepository;
 
     @Transactional
     public ResultWithCountFor<RoomDTO> createRoom(int numImpostors, String playerName, Language language, Difficulty difficulty, boolean privateRoom) {
@@ -104,7 +106,23 @@ public class RoomService {
         room.setStatus(GameStatus.STARTED.toString());
         room.setStartedAt(Instant.now());
 
-        String wordForThisRound = wordService.getRandomWord(Language.valueOf(room.getLanguage()), Difficulty.valueOf(room.getDifficulty()));
+        String wordForThisRound = null;
+        if (Difficulty.CUSTOM.name().equals(room.getDifficulty())) {
+            List<CustomWord> customWords = customWordRepository.findAllByRoomPublicIdAndPickedIsFalse(roomPublicId);
+            if (customWords.isEmpty()) {
+                publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), lastImposters, lastWord, Difficulty.valueOf(room.getDifficulty()), room.isPrivateRoom(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
+                return false;
+            }
+
+            // Pick random custom word
+            CustomWord selectedCustomWord = customWords.get(new Random().nextInt(customWords.size()));
+            wordForThisRound = selectedCustomWord.getWord();
+            selectedCustomWord.setPicked(true);
+            customWordRepository.save(selectedCustomWord);
+        } else {
+            wordForThisRound = wordService.getRandomWord(Language.valueOf(room.getLanguage()), Difficulty.valueOf(room.getDifficulty()));
+        }
+
         List<UUID> imposterPublicIds = pickRandomPlayers(players, room.getNumImpostors());
 
         for(Player player : players){

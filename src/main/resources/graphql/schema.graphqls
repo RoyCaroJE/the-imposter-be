@@ -12,6 +12,10 @@ type Mutation {
     leaveRoom(playerPublicId: ID!): Boolean!
     kickPlayer(playerPublicId: ID!): Boolean!
 
+    # Custom Word
+    startWordSubmission(roomPublicId: ID!): Boolean!
+    addWords(playerPublicId: ID!, roomPublicId: ID!, words: [String!]!): Boolean!
+
     # Heartbeat
     playerHeartbeat(playerPublicId: ID!): Boolean!
 }
