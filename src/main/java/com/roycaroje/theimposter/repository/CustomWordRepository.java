@@ -10,5 +10,6 @@ import java.util.UUID;
 @Repository
 public interface CustomWordRepository extends JpaRepository<CustomWord, Long> {
     List<CustomWord> findAllByRoomPublicIdAndPickedIsFalse(UUID roomPublicId);
-}
 
+    void deleteAllByRoomPublicId(UUID roomPublicId);
+}

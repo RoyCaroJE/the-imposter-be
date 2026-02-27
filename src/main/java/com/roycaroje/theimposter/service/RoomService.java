@@ -228,6 +228,11 @@ public class RoomService {
         room.setStartedAt(null);
         room = roomRepository.save(room);
 
+        // Delete custom words if difficulty is CUSTOM
+        if (Difficulty.CUSTOM.name().equals(room.getDifficulty())) {
+            customWordRepository.deleteAllByRoomPublicId(roomPublicId);
+        }
+
         publisher.publish(new RoomStatusDTO(room.getPublicId(), GameStatus.WAITING, null, Language.valueOf(room.getLanguage()), room.getNumImpostors(), imposters, roomWord, Difficulty.valueOf(room.getDifficulty()), room.isPrivateRoom(), playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId())));
         return true;
     }
