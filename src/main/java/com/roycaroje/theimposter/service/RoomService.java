@@ -3,6 +3,7 @@ package com.roycaroje.theimposter.service;
 import com.roycaroje.theimposter.graphql.*;
 import com.roycaroje.theimposter.graphql.player.*;
 import com.roycaroje.theimposter.graphql.room.PublicRoomsDTO;
+import com.roycaroje.theimposter.graphql.room.RemainingCustomWordsDTO;
 import com.roycaroje.theimposter.graphql.room.RoomDTO;
 import com.roycaroje.theimposter.graphql.room.RoomStatusDTO;
 import com.roycaroje.theimposter.model.*;
@@ -248,6 +249,13 @@ public class RoomService {
     public ResultWithCountFor<PublicRoomsDTO> getAllPublicRooms(){
         List<PublicRoomsDTO> publicRooms = roomRepository.findAllPublicRooms();
         return new ResultWithCountFor<>(publicRooms);
+    }
+
+    public ResultWithCountFor<RemainingCustomWordsDTO> getRemainingCustomWordsByRoomPublicId(UUID roomPublicId) {
+        List<CustomWord> customWords = customWordRepository.findAllByRoomPublicIdAndPickedIsFalse(roomPublicId);
+        RemainingCustomWordsDTO dto = new RemainingCustomWordsDTO();
+        dto.setRemainingCustomWords(customWords.size());
+        return new ResultWithCountFor<>(List.of(dto));
     }
 
 }

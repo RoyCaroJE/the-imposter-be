@@ -2,6 +2,7 @@ package com.roycaroje.theimposter.resolver;
 
 import com.roycaroje.theimposter.graphql.ResultWithCountFor;
 import com.roycaroje.theimposter.graphql.room.PublicRoomsDTO;
+import com.roycaroje.theimposter.graphql.room.RemainingCustomWordsDTO;
 import com.roycaroje.theimposter.graphql.room.RoomDTO;
 import com.roycaroje.theimposter.model.Difficulty;
 import com.roycaroje.theimposter.model.Language;
@@ -69,6 +70,11 @@ public class RoomResolver {
     @QueryMapping
     public ResultWithCountFor<PublicRoomsDTO> getAllPublicRooms(){
         return roomService.getAllPublicRooms();
+    }
+
+    @QueryMapping
+    public ResultWithCountFor<RemainingCustomWordsDTO> getRemainingCustomWordsByRoomPublicId(@Argument UUID roomPublicId) {
+        return roomService.getRemainingCustomWordsByRoomPublicId(roomPublicId);
     }
 }
 

@@ -61,3 +61,12 @@ type PublicRoomsDTO {
     language: Language!
     difficulty: Difficulty!
 }
+
+type ResultWithCountForRemainingCustomWordsDTO {
+    queryCount: Int!
+    result: [RemainingCustomWordsDTO!]!
+}
+
+type RemainingCustomWordsDTO {
+    remainingCustomWords: Int!
+}

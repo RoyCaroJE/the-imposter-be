@@ -24,6 +24,7 @@ type Query {
     getRoomByCode(roomCode: String!): ResultWithCountForRoomDTO!
     getPlayerWord(playerPublicId: ID!): ResultWithCountForPlayerWordDTO!
     getAllPublicRooms: ResultWithCountForPublicRoomsDTO!
+    getRemainingCustomWordsByRoomPublicId(roomPublicId: ID!): ResultWithCountForRemainingCustomWordsDTO!
 }
 
 type Subscription {
