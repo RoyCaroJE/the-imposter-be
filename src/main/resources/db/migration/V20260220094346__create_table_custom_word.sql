@@ -1,6 +1,6 @@
 -- Create Custom Word Table
 CREATE TABLE custom_word (
-    id SERIAL PRIMARY KEY,
+    id BIGINT PRIMARY KEY,
     public_id UUID NOT NULL UNIQUE,
     created TIMESTAMP NOT NULL DEFAULT NOW(),
     room_public_id UUID NOT NULL,
