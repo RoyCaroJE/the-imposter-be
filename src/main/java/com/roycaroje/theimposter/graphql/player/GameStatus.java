@@ -1,5 +1,5 @@
 package com.roycaroje.theimposter.graphql.player;
 
 public enum GameStatus {
-    WAITING, STARTED, PLAYING
+    WAITING, WORD_SUBMISSION, STARTED, PLAYING
 }

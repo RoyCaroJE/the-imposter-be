@@ -30,6 +30,7 @@ type RoomStatusDTO {
 
 enum GameStatus {
     WAITING
+    WORD_SUBMISSION
     STARTED
     PLAYING
 }
@@ -44,6 +45,7 @@ enum Difficulty {
     MEDIUM
     HARD
     MIXED
+    CUSTOM
 }
 
 type ResultWithCountForPublicRoomsDTO {
@@ -58,4 +60,13 @@ type PublicRoomsDTO {
     numImpostors: Int!
     language: Language!
     difficulty: Difficulty!
+}
+
+type ResultWithCountForRemainingCustomWordsDTO {
+    queryCount: Int!
+    result: [RemainingCustomWordsDTO!]!
+}
+
+type RemainingCustomWordsDTO {
+    remainingCustomWords: Int!
 }
