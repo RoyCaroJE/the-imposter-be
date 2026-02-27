@@ -96,7 +96,7 @@ public class RoomService {
         if(GameStatus.PLAYING.name().equals(room.getStatus())) {
             Optional<Player> firstNonImposter = players.stream().filter(p -> !p.isImpostor()).findFirst();
             if(firstNonImposter.isEmpty()) {
-                throw new RuntimeException("Unexpected error: No non-imposter player exists");
+                throw new RuntimeException("Unexpected error: No non-imposter player exists!");
             }
             lastWord = firstNonImposter.get().getWord();
             lastImposters = players.stream().filter(Player::isImpostor).map(Player::getName).toList();
