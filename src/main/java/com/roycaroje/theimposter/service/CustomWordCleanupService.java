@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
-@Slf4j
 public class CustomWordCleanupService {
 
     private final CustomWordRepository customWordRepository;
@@ -21,19 +20,14 @@ public class CustomWordCleanupService {
     @Scheduled(fixedRate = 300000) // 5 minutes = 300000 milliseconds
     @Transactional
     public void cleanupOrphanedCustomWords() {
-        log.info("Starting cleanup of orphaned custom words");
-
         customWordRepository.findAll().forEach(customWord -> {
             boolean roomExists = roomRepository.findByPublicId(customWord.getRoomPublicId()).isPresent();
             boolean playerExists = playerRepository.findByPublicId(customWord.getPlayerPublicId()).isPresent();
 
             if (!roomExists || !playerExists) {
                 customWordRepository.delete(customWord);
-                log.debug("Deleted orphaned custom word with id: {}", customWord.getId());
             }
         });
-
-        log.info("Cleanup of orphaned custom words completed");
     }
 }
 
