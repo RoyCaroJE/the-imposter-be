@@ -4,7 +4,6 @@ import com.roycaroje.theimposter.repository.CustomWordRepository;
 import com.roycaroje.theimposter.repository.PlayerRepository;
 import com.roycaroje.theimposter.repository.RoomRepository;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
