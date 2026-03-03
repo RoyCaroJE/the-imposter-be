@@ -62,7 +62,10 @@ public class WordService {
 
         for (Difficulty diff : Difficulty.values()) {
             if (diff != Difficulty.MIXED) {
-                mixed.addAll(difficulties.get(diff));
+                List<String> diffWords = difficulties.get(diff);
+                if (diffWords != null) {
+                    mixed.addAll(diffWords);
+                }
             }
         }
 
