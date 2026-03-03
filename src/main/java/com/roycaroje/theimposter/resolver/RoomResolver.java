@@ -76,5 +76,10 @@ public class RoomResolver {
     public ResultWithCountFor<RemainingCustomWordsDTO> getRemainingCustomWordsByRoomPublicId(@Argument UUID roomPublicId) {
         return roomService.getRemainingCustomWordsByRoomPublicId(roomPublicId);
     }
+
+    @QueryMapping
+    public String getOfflineWord(@Argument Language language, @Argument Difficulty difficulty) {
+        return roomService.getOfflineWord(language, difficulty);
+    }
 }
 

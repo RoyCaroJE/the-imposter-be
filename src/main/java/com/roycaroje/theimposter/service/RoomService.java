@@ -263,4 +263,8 @@ public class RoomService {
         return new ResultWithCountFor<>(List.of(dto));
     }
 
+    public String getOfflineWord(Language language, Difficulty difficulty) {
+        return wordService.getRandomWord(language, difficulty);
+    }
+
 }

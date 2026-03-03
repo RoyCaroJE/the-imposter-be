@@ -25,6 +25,7 @@ type Query {
     getPlayerWord(playerPublicId: ID!): ResultWithCountForPlayerWordDTO!
     getAllPublicRooms: ResultWithCountForPublicRoomsDTO!
     getRemainingCustomWordsByRoomPublicId(roomPublicId: ID!): ResultWithCountForRemainingCustomWordsDTO!
+    getOfflineWord(language: Language, difficulty: Difficulty): String!
 }
 
 type Subscription {
