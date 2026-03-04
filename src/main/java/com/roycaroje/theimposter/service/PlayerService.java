@@ -37,6 +37,7 @@ public class PlayerService {
     private final GameEventPublisher publisher;
 
     private static final Duration TIMEOUT = Duration.ofSeconds(15);
+    private static final int MAX_PLAYERS_PER_ROOM = 15;
 
     @Scheduled(fixedRate = 5_000)
     // Every 5 seconds we check all connected players and we disconnect them if they're not
@@ -139,6 +140,9 @@ public class PlayerService {
 
         Room room = roomRepository.findByCode(roomCode).orElseThrow(() -> new RuntimeException("room_not_found"));
         List<PlayerDTO> playersBefore = playerRepository.findPlayersDTOByRoomPublicId(room.getPublicId());
+        if (playersBefore.size() > MAX_PLAYERS_PER_ROOM) {
+            throw new RuntimeException("room_full");
+        }
         boolean playerNameAlreadyExists = playersBefore.stream().anyMatch(p -> p.getName().equalsIgnoreCase(playerName));
         if(playerNameAlreadyExists) {
             throw new IllegalArgumentException("player_name_already_exists");

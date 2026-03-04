@@ -25,6 +25,9 @@ spring:
       enabled: false
     websocket:
       path: /graphql
+    schema:
+      introspection:
+        enabled: false
 
 server:
   forward-headers-strategy: framework

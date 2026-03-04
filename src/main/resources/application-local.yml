@@ -4,9 +4,13 @@ spring:
       on-profile: local
   application:
     name: theimposter
+  security:
+    user:
+      name: root
+      password: password
   datasource:
     url: jdbc:postgresql://localhost:5432/theimposter
-    username: postgres
+    username: root
     password: password
     driver-class-name: org.postgresql.Driver
   flyway:
