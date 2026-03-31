@@ -8,6 +8,7 @@ WORKDIR /app
 # Cache
 COPY pom.xml .
 RUN mvn dependency:go-offline
+RUN mkdir -p /app/logs
 
 # Code
 COPY src ./src

@@ -42,7 +42,7 @@ logging:
     com.roycaroje.theimposter: DEBUG
     org.flywaydb: DEBUG
   file:
-    name: /app/logs/app.log
+    name: target/logs/app.log
 
 management:
   endpoints:
