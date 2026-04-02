@@ -45,6 +45,8 @@ logging:
     name: target/logs/app.log
 
 management:
+  server:
+    port: 8081
   endpoints:
     web:
       exposure:
