@@ -1,4 +1,0 @@
-FROM grafana/promtail:latest
-
-COPY monitoring/promtail.yml /etc/monitoring/promtail.yml
-
