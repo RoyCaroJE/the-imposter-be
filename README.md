@@ -554,4 +554,4 @@ For issues, questions, or suggestions, please open an issue on GitHub or contact
 
 ---
 
-**Made with ❤️ by the development team**
+**Made with ❤️ by the Jean Edouard Roy Caro**
