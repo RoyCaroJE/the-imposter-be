@@ -4,11 +4,11 @@
 [![Spring Boot 4.0.1](https://img.shields.io/badge/Spring%20Boot-4.0.1-brightgreen?logo=spring)](https://spring.io/projects/spring-boot)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17.5-blue?logo=postgresql)](https://www.postgresql.org/)
 [![GraphQL](https://img.shields.io/badge/GraphQL-Apollo-e10098?logo=graphql)](https://graphql.org/)
-[![Website](https://img.shields.io/badge/Website-the--imposter.app-blue)](https://www.the-imposter.app/)
+[![Website](https://img.shields.io/badge/Website-the--imposter.app-blue)](https://the-imposter.app/)
 
 A robust and scalable backend service for **The Imposter** game, built with modern Java technologies and real-time capabilities. This is a multiplayer party game where players try to identify the impostor among them.
 
-🌐 **Live Demo**: [https://www.the-imposter.app/](https://www.the-imposter.app/)
+🌐 **Live Demo**: [https://the-imposter.app/](https://the-imposter.app/)
 
 ## Table of Contents
 
