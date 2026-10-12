@@ -10,7 +10,7 @@ spring:
       password: password
   datasource:
     url: jdbc:postgresql://localhost:5432/theimposter
-    username: root
+    username: postgres
     password: password
     driver-class-name: org.postgresql.Driver
   flyway:
